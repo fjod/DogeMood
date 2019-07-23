@@ -10,6 +10,8 @@ namespace Doge.Models
     {
         public byte[] Image { get; set; }
 
+        public byte[] Pictogram { get; set; }
+
         [Key]
         public int Id { get; set; }
     }
