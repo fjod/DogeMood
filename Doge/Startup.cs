@@ -51,8 +51,8 @@ namespace Doge
 
             services.AddHostedService<TimedHostedService>();
 
-            services.AddScoped<IGetToken, RedditToken>();
-
+            services.AddSingleton<IGetToken, RedditToken>();
+            services.AddSingleton<IGetPics, RedditPics>();
 
         }
 

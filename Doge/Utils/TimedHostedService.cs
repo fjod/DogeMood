@@ -35,8 +35,10 @@ namespace Doge.Utils
         {
             //   Log.ForContext<TimedHostedService>().Information(" ");
 
-            //use pictures here
-          
+            //add pics to db
+
+           var pics = pictures.GetPicsUrls();
+
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
