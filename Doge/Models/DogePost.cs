@@ -16,9 +16,16 @@ namespace Doge.Models
         public DateTime AddDate { get; set; }
         public bool IsApproved { get; set; }
 
-       
-        public int ImageId { get; set; }
-        [ForeignKey("ImageId")]
-        public virtual DogeImage DogeImage { get; set; }
+        //one image for one post
+        //one-to-one relation
+        [ForeignKey("DogeImage")]
+        public int DogeImageFK { get; set; }        
+        public DogeImage DogeImage { get; set; }
+
+
+        //each user can have multiple favorite posts
+        //each post can have multiple users that favorited it
+        //many-to-many relation
+        public ICollection<UserPost> Users { get; set; }
     }
 }

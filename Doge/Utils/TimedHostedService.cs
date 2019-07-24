@@ -37,7 +37,7 @@ namespace Doge.Utils
 
             //add pics to db
 
-           var pics = pictures.GetPicsUrls();
+           //var pics = pictures.GetPicsUrls();
 
         }
 

@@ -14,5 +14,7 @@ namespace Doge.Models
 
         [Key]
         public int Id { get; set; }
+
+        public DogePost Post { get; set; }
     }
 }

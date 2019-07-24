@@ -10,6 +10,8 @@ namespace Doge.Models
 
     public class DogeUser : IdentityUser
     {
-        public string Name { get; set; }       
+        public string Name { get; set; }
+
+        public ICollection<UserPost> FavoritePosts { get; set; }
     }
 }

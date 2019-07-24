@@ -1,0 +1,43 @@
+﻿@model Doge.Areas.User.Models.DogePostForUser
+
+    <div class="card">
+        <img class="card-img-top" src="~/images/sampleImage.jpg">
+        <div class="card-body">
+            @{
+                bool like = Model.WasLiked;
+                string _like = like.ToString().ToLower();
+                string likeText = "Like";
+                if (!like)
+                {
+                    likeText = "Unlike";
+                }
+
+                bool fav = Model.WasFavorited;
+                 string _fav = fav.ToString().ToLower();
+                string favText = "Favorite";
+                if (!fav)
+                {
+                    favText = "Unfavorite";
+                }
+            }
+            <div class="text-center">
+               
+                    <button type="button" class="btn btn-primary"
+                            data-toggle="button" aria-pressed="@_like"
+                            autocomplete="off">
+                        @likeText
+                    </button>
+
+                    <button type="button" class="btn btn-primary"
+                            data-toggle="button" aria-pressed="@_fav"
+                            autocomplete="off">
+                        @favText
+                    </button>
+
+                    <button type="button" class="btn btn-primary">
+                        Share
+                    </button>
+             
+            </div>
+        </div>
+    </div>
