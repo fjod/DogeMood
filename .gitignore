@@ -81,3 +81,14 @@ Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Identity/Pages/Account/Manage/DownloadP
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Identity/Pages/Account/Manage/Disable2fa.g.cshtml.cs
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Identity/Pages/Account/Manage/DeletePersonalData.g.cshtml.cs
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Identity/Pages/Account/Manage/ChangePassword.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Views/Shared/_NotificationPanel.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/User/Views/_ViewStart.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/User/Views/_ViewImports.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/User/Views/Home/UploadNewDoge.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/_ViewStart.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/_ViewImports.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Index.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Edit.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Details.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Delete.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Create.g.cshtml.cs

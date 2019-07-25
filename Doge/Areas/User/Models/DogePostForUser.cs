@@ -11,4 +11,7 @@ namespace Doge.Areas.User.Models
         public bool WasFavorited { get; set; }
         public bool WasLiked { get; set; }
     }
+
+  
+
 }

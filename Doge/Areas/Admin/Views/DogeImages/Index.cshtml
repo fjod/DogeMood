@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Doge.Models.DogeImage>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Doges in DataBase</h1>
+
+           
+<p>
+    <a asp-action="Index" asp-route-ShowUnApprovedOnly="true">
+        ShowOnlyUnapproved
+    </a>
+    <a asp-action="Index" >
+        ShowAll
+    </a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pictogram)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Image)
+                </td>
+                <td>
+                    <img class="card-img-top"
+                         @{ var b64 = Convert.ToBase64String(item.Pictogram); var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); }
+                         src="@imgsrc">
+
+                </td>
+                <td>                    
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

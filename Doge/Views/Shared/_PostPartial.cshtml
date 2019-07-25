@@ -1,43 +1,54 @@
 ﻿@model Doge.Areas.User.Models.DogePostForUser
 
-    <div class="card">
-        <img class="card-img-top" src="~/images/sampleImage.jpg">
+
+    <div class="card border-info">
+        <img class="card-img-top"
+             @{ var b64 = Convert.ToBase64String(Model.Post.DogeImage.Image);
+                var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); 
+              }
+          
+                src="@imgsrc">
+
         <div class="card-body">
             @{
                 bool like = Model.WasLiked;
                 string _like = like.ToString().ToLower();
+                string _likeActive = "active";
                 string likeText = "Like";
                 if (!like)
                 {
                     likeText = "Unlike";
+                    _likeActive = "";
                 }
 
                 bool fav = Model.WasFavorited;
-                 string _fav = fav.ToString().ToLower();
+                string _fav = fav.ToString().ToLower();
                 string favText = "Favorite";
+                string _favActive = "active";
                 if (!fav)
                 {
                     favText = "Unfavorite";
+                    _favActive = "";
                 }
             }
             <div class="text-center">
-               
-                    <button type="button" class="btn btn-primary"
-                            data-toggle="button" aria-pressed="@_like"
-                            autocomplete="off">
-                        @likeText
-                    </button>
 
-                    <button type="button" class="btn btn-primary"
-                            data-toggle="button" aria-pressed="@_fav"
-                            autocomplete="off">
-                        @favText
-                    </button>
+                <button type="button" class="btn btn-primary @_likeActive"
+                        data-toggle="button" aria-pressed="@_like"
+                        autocomplete="off">
+                    @likeText
+                </button>
 
-                    <button type="button" class="btn btn-primary">
-                        Share
-                    </button>
-             
+                <button type="button" class="btn btn-primary @_favActive"
+                        data-toggle="button" aria-pressed="@_fav"
+                        autocomplete="off">
+                    @favText
+                </button>
+
+                <button type="button" class="btn btn-info">
+                    Share
+                </button>
+
             </div>
         </div>
     </div>
