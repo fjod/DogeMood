@@ -40,5 +40,7 @@ namespace Doge.Data
             //        .WithOne(b => b.DogeImage)
             //        .HasForeignKey<DogePost>(b => b.DogePostRef);
         }
+
+        public DbSet<Doge.Models.UserPost> UserPost { get; set; }
     }
 }

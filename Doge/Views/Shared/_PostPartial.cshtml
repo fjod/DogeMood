@@ -3,8 +3,17 @@
 
     <div class="card border-info">
         <img class="card-img-top"
-             @{ var b64 = Convert.ToBase64String(Model.Post.DogeImage.Image);
-                var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); 
+             @{ 
+                 string imgsrc = "";
+                 if (Model.Post.DogeImage.URL.Length > 0)
+                 {
+                     imgsrc = Model.Post.DogeImage.URL;
+                 }
+                 else
+                 {
+                     var b64 = Convert.ToBase64String(Model.Post.DogeImage.Image);
+                     imgsrc = string.Format("data:image/jpg;base64,{0}", b64);
+                 }
               }
           
                 src="@imgsrc">
@@ -35,13 +44,18 @@
 
                 <button type="button" class="btn btn-primary @_likeActive"
                         data-toggle="button" aria-pressed="@_like"
-                        autocomplete="off">
+                        autocomplete="off"
+                        asp-action="LikePost" asp-route-id="@Model.Post.Id"
+                        >
                     @likeText
                 </button>
 
                 <button type="button" class="btn btn-primary @_favActive"
                         data-toggle="button" aria-pressed="@_fav"
-                        autocomplete="off">
+                        autocomplete="off"
+                        asp-action="FavoritePost" asp-route-postId="@Model.Post.Id"
+                        >
+
                     @favText
                 </button>
 

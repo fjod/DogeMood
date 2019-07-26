@@ -56,9 +56,9 @@ namespace Doge
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddHostedService<TimedHostedService>();
+            services.AddHostedService<DownloadPicsDailyService>();
 
-            services.AddSingleton<IGetToken, RedditToken>();
+           
             services.AddSingleton<IGetPics, RedditPics>();
 
         }
