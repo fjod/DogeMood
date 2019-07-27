@@ -18,9 +18,10 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Doge.Controllers
 {
-    //https://github.com/dncuug/X.PagedList
+    
 
     [Area("User")]
     public class HomeController : AlertController
@@ -43,31 +44,8 @@ namespace Doge.Controllers
         }
 
        
-        public async Task<IActionResult> UserFavorites()
-        {
-            if (!TempData.ContainsKey(favPrevPostSkip))
-            {
-                TempData.Add(favPrevPostSkip, "true");
-            }
-
-            if (!TempData.ContainsKey(favNextPostSkip))
-            {
-                TempData.Add(favNextPostSkip, "false");
-            }
-
-            if (!TempData.ContainsKey(postShiftForFavorites))
-            {
-                TempData.Add(postShiftForFavorites, "0");
-            }
-
-            var shift = int.Parse(TempData[postShiftForFavorites].ToString());
-
-            TempData[favPrevPostSkip] = (shift <=0).ToString();
-            if (shift < 0)
-            {
-                shift = 0;                
-            }
-            
+        public async Task<IActionResult> UserFavorites(int pageNumber = 1)
+        {       
 
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
@@ -76,43 +54,29 @@ namespace Doge.Controllers
 
             var favPosts = (from p in _db.Posts
                             where p.Users.Any(post => post.DogeUser == dbUser)
-                            select p).Skip(shift).Take(totalPostOnPage); //.Include(im => im.DogeImage); 
+                            select p);//.Skip(page).Take(totalPostOnPage); //.Include(im => im.DogeImage); 
+
             
+            var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
 
             //pics can be HECKING BIG
             //I'm not sure if it will be async
             //lets do it on next step
-           
-            
-
             List<DogePostForUser> lt = new List<DogePostForUser>();
-            await favPosts.ForEachAsync(async p =>
-             {
-                 p.DogeImage = await _db.Images.FirstOrDefaultAsync(im => im.Post == p);
-                 lt.Add(new DogePostForUser
-                 {
-                     Post = p,
-                     WasFavorited = true,
-                     WasLiked = false //well it's a small loophole to abuse
-                 });
-             });
 
-            //now to check how many posts we can look forward
-            var favPostsCount = (from p in _db.Posts
-                            where p.Users.Any(post => post.DogeUser == dbUser)
-                            select p).Count();
-            if (favPostsCount - shift  < 0)
+            foreach (var item in paginatedDoges)
             {
-                TempData[favNextPostSkip]= "true";
+                item.DogeImage = await _db.Images.FirstOrDefaultAsync(im => im.Post == item);
+                lt.Add(new DogePostForUser
+                {
+                    Post = item,
+                    WasFavorited = true,
+                    WasLiked = false //well it's a small loophole to abuse
+                });
             }
-            else
-            {
-                TempData[favNextPostSkip] = "false";
-            }
+            paginatedDoges.Posts = lt;
 
-            
-          
-            return View(lt);
+            return View(paginatedDoges);
         }
 
 
@@ -220,37 +184,36 @@ namespace Doge.Controllers
 
         string orderKey = "sortOrderKey";        
 
-        public async Task<IActionResult> Index(string SortOrder = "")
+        public async Task<IActionResult> Index(string sortOrder, int pageNumber = 1)
         {
-            if (!TempData.ContainsKey(orderKey))
-            {
-                TempData.Add(orderKey, SortOrder);
-            }
-            else
-            {
-                TempData[orderKey] = SortOrder;
-            }
-
+            ViewData["CurrentSort"] = sortOrder;
 
             var favPosts = (from p in _db.Posts                           
-                            select p).Skip(shift).Take(totalPostOnPage); 
+                            select p);
+            if (sortOrder == "byNew") favPosts = from post in favPosts orderby post.AddDate select post;
+            if (sortOrder == "byTop") favPosts = from post in favPosts orderby post.UpVotes select post;
 
+          
+            var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
 
+            //pics can be HECKING BIG
+            //I'm not sure if it will be async
+            //lets do it on next step
             List<DogePostForUser> lt = new List<DogePostForUser>();
-            await favPosts.ForEachAsync(async p =>
+
+            foreach (var item in paginatedDoges)
             {
-                p.DogeImage = await _db.Images.FirstOrDefaultAsync(im => im.Post == p);
+                item.DogeImage = await _db.Images.FirstOrDefaultAsync(im => im.Post == item);
                 lt.Add(new DogePostForUser
                 {
-                    Post = p,
-                    WasFavorited = false,
-                    WasLiked = false 
+                    Post = item,
+                    WasFavorited = true,
+                    WasLiked = false //well it's a small loophole to abuse
                 });
-            });
+            }
+            paginatedDoges.Posts = lt;
 
-            
-
-            return View(lt);           
+            return View(paginatedDoges);
         }
 
       
@@ -324,12 +287,12 @@ namespace Doge.Controllers
             {
                 var userPost = post.Users.First(up => up.DogePost == post);
                 post.Users.Remove(userPost);
-                return RedirectToAction("UserFavorites", TempData[postShiftForFavorites]);
+                return RedirectToAction("UserFavorites" );
             }
 
             AddPostToFavorites(post);
             await _db.SaveChangesAsync();
-            return RedirectToAction("UserFavorites", TempData[postShiftForFavorites]);
+            return RedirectToAction("UserFavorites");
         }
 
         public IActionResult Privacy()

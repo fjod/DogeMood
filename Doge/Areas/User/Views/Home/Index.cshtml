@@ -1,9 +1,13 @@
-﻿@model IEnumerable<Doge.Areas.User.Models.DogePostForUser>
+﻿@model Doge.Utils.PaginatedList<DogePost>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
 
 
 <div class="container text-center pb-3">
     <div class="btn-group">
-        
         <a class="btn btn-info" asp-route-sortOrder="byTop"
            asp-controller="Home" asp-action="Index">
             Top
@@ -29,6 +33,18 @@
         </div>
     </div>
 
-   
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       class="btn btn-default @prevDisabled">
+        Previous
+    </a>
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       class="btn btn-default @nextDisabled">
+        Next
+    </a>
 
 </div>
+

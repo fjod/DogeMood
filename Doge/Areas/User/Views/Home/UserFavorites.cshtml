@@ -1,26 +1,44 @@
-﻿@model IEnumerable<Doge.Models.UserPost>
+﻿@model Doge.Utils.PaginatedList<DogePost>
 
 @{
     ViewData["Title"] = "UserFavorites";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
 <h1>Your Favorite Shibes!</h1>
 
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
 
 <div class="container-fluid">
     <div class="row">
         <div class="row">
-            @foreach (var item in Model)
+            @foreach (var product in Model.Posts)
             {
 
                 <div class="col-md-6 pb-3">
                     <partial name="_PostPartial"
-                             model="@item" />
+                             model="@product" />
                 </div>
             }
         </div>
     </div>
 
-   
+    <a asp-action="UserFavorites"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       class="btn btn-default @prevDisabled">
+        Previous
+    </a>
+    <a asp-action="UserFavorites"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       class="btn btn-default @nextDisabled">
+        Next
+    </a>
 </div>
+
+
+
+

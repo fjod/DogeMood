@@ -56,11 +56,11 @@ namespace Doge
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddHostedService<DownloadPicsDailyService>();
+           
 
            
             services.AddSingleton<IGetPics, RedditPics>();
-
+            services.AddHostedService<TimedHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

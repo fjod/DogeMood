@@ -6,29 +6,29 @@ using System.Threading;
 using System.Threading.Tasks;
 using Doge.Models;
 using Doge.Data;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Doge.Utils
 {
-    internal class DownloadPicsDailyService : IHostedService, IDisposable
+    internal class TimedHostedService : IHostedService, IDisposable
     {
         private Timer _timer;
 
 
-        IGetPics pictures;
-        ApplicationDbContext _context;
-        public DownloadPicsDailyService(ApplicationDbContext db, IGetPics _pics)
-        {          
-            pictures = _pics;
-            _context = db;
-        }
+        IGetPics pictures;       
+        private readonly IServiceScopeFactory scopeFactory;      
 
-      
+        public TimedHostedService(IGetPics _pics, IServiceScopeFactory scopeFactory)
+        {
+            pictures = _pics;
+            this.scopeFactory = scopeFactory;
+        }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                //TimeSpan.FromHours(24));
+               // TimeSpan.FromHours(24));
                 TimeSpan.FromSeconds(10));
 
             return Task.CompletedTask;
@@ -36,39 +36,41 @@ namespace Doge.Utils
 
         private void DoWork(object state)
         {
-            Log.ForContext<DownloadPicsDailyService>().Information("Downloading pics from Reddit..");
-
-            
-           //these pics are not favorited, so we store URLs only
-           //all of them are approved from start
-           var pics = pictures.GetPicsUrls();
-
-            pics.ForEach(pic =>
+            Log.ForContext<TimedHostedService>().Information("Downloading pics from Reddit..");
+            using (var scope = scopeFactory.CreateScope())
             {
-                DogeImage im = new DogeImage
+                var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                //these pics are not favorited, so we store URLs only
+                //all of them are approved from start
+                var pics = pictures.GetPicsUrls();
+
+                pics.ForEach(pic =>
                 {
-                   URL = pic
-                   //when someone makes it favorite, need to create thumbnail and copy image to db
-                };
-                DogePost post = new DogePost
-                {
-                    AddDate = DateTime.Now,
-                    DogeImage = im,
-                    IsApproved = true,
-                    UpVotes = 0
-                };
-                im.Post = post;
+                    DogeImage im = new DogeImage
+                    {
+                        URL = pic
+                        //when someone makes it favorite, need to create thumbnail and copy image to db
+                    };
+                    DogePost post = new DogePost
+                    {
+                        AddDate = DateTime.Now,
+                        DogeImage = im,
+                        IsApproved = true,
+                        UpVotes = 0
+                    };
+                    im.Post = post;
 
-                Log.ForContext<DownloadPicsDailyService>().Information(pic);
+                    Log.ForContext<TimedHostedService>().Information(pic);
 
-                 _context.Images.Add(im);
-                 _context.Posts.Add(post);
-            });
+                    _context.Images.Add(im);
+                    _context.Posts.Add(post);
+                });
 
 
-            _context.SaveChanges();
-
-            Log.ForContext<DownloadPicsDailyService>().Information("saved images to database");
+                _context.SaveChanges();
+            } 
+            Log.ForContext<TimedHostedService>().Information("saved images to database");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -85,4 +87,5 @@ namespace Doge.Utils
 
        
     }
+    
 }
