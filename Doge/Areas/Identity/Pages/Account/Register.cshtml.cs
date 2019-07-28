@@ -73,7 +73,7 @@ namespace Doge.Areas.Identity.Pages.Account
             {
                 var user = new Models.DogeUser { UserName = Input.Email,
                     Email = Input.Email,
-                    Name = Input.Name };
+                    NormalizedUserName = Input.Name };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

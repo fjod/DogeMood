@@ -44,6 +44,16 @@ namespace Doge.Utils
                 //these pics are not favorited, so we store URLs only
                 //all of them are approved from start
                 var pics = pictures.GetPicsUrls();
+                //https://i.imgur.com/QA5wmpx.jpg
+                pics.ForEach(p =>
+                {
+                    //little conversin for imgur
+                    if (p.Contains("imgur"))
+                    {
+                        var image = p.Substring("https://imgur.com/".Length);
+                        p = "https://i.imgur.com/" + image + ".jpg";
+                    }
+                });
 
                 pics.ForEach(pic =>
                 {

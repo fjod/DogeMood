@@ -8,6 +8,13 @@
     <UserSecretsId>fba2c20a-0e78-4b73-b317-14fdd1711960</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20190728091420_url_in_image.cs" />
+    <Compile Remove="Data\Migrations\20190728091420_url_in_image.Designer.cs" />
+    <Compile Remove="Data\Migrations\20190728091730_url_in_image.cs" />
+    <Compile Remove="Data\Migrations\20190728091730_url_in_image.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.1" />
