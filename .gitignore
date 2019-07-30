@@ -92,3 +92,5 @@ Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Edit.g.cshtml.cs
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Details.g.cshtml.cs
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Delete.g.cshtml.cs
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/Create.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Areas/User/Views/Home/UserFavorites.g.cshtml.cs
+Doge/obj/Debug/netcoreapp2.2/Razor/Views/Shared/_FavPostPartial.g.cshtml.cs
