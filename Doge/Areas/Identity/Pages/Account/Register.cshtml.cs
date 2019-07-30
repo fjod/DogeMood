@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -73,12 +74,13 @@ namespace Doge.Areas.Identity.Pages.Account
             {
                 var user = new Models.DogeUser { UserName = Input.Email,
                     Email = Input.Email,
-                    NormalizedUserName = Input.Name };
+                    Name = Input.Name };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     Log.ForContext<RegisterModel>().Information("created new account for " + Input.Name 
                         + "with email " + Input.Email);
+
 
                     if (!await _roleManager.RoleExistsAsync(Utils.UserRoles.DogeAdmin))
                     {
@@ -93,14 +95,23 @@ namespace Doge.Areas.Identity.Pages.Account
                     else
                     {
                         await _userManager.AddToRoleAsync(user, Utils.UserRoles.DogeUser);
-                       
+
                     }
+
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
                 }
+
+                var error = result.Errors.ToList(); //convert to list
+
+                foreach (var err in error) //iterate through individual error
+                {
+                    this.ModelState.AddModelError("Password", err.Description);
+                }
             }
 
+            
             // If we got this far, something failed, redisplay form
             return Page();
         }

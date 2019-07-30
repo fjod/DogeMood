@@ -17,7 +17,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Doge.Controllers
 {
@@ -30,11 +30,13 @@ namespace Doge.Controllers
 
         ApplicationDbContext _db { get; set; }
         IHostingEnvironment _env;
-     
-        public HomeController(ApplicationDbContext db, IHostingEnvironment env)
+        private readonly IServiceScopeFactory scopeFactory;
+        public HomeController(ApplicationDbContext db, IHostingEnvironment env, IServiceScopeFactory scope)
         {
             _db = db;
-            _env = env;          
+            _env = env;
+            scopeFactory = scope;
+
 
         }
 
@@ -58,10 +60,7 @@ namespace Doge.Controllers
 
             
             var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
-
-            //pics can be HECKING BIG
-            //I'm not sure if it will be async
-            //lets do it on next step
+                       
             List<DogePostForUser> lt = new List<DogePostForUser>();
 
             foreach (var item in paginatedDoges)
@@ -154,8 +153,13 @@ namespace Doge.Controllers
                 alertText = "File uploaded";
             }
 
+            var claimsId = (ClaimsIdentity)User.Identity;
+            var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = cl.Value;
+            var dbUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
 
-            AddPostToFavorites(post);
+            UserPost _up = new UserPost { DogePost = post, DogeUser = dbUser };
+            post.Users.Add(_up);            
 
             im.Post = post;
 
@@ -168,47 +172,60 @@ namespace Doge.Controllers
             return RedirectToAction("Index"); 
         }
 
-        void AddPostToFavorites(DogePost post)
-        {
-            var claimsId = (ClaimsIdentity)User.Identity;
-            var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
-            var userId = cl.Value;
-            var dbUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
-
-            //also this post is favorited by user
-            UserPost up = new UserPost { DogePost = post, DogeUser = dbUser };
-            _db.DogeUsers.Find(dbUser).FavoritePosts.Add(up);
-        }
+       
 
         
 
         string orderKey = "sortOrderKey";        
 
         public async Task<IActionResult> Index(string sortOrder, int pageNumber = 1)
-        {
-            ViewData["CurrentSort"] = sortOrder;
+        {        
 
-            var favPosts = (from p in _db.Posts                           
-                            select p);
-            if (sortOrder == "byNew") favPosts = from post in favPosts orderby post.AddDate select post;
-            if (sortOrder == "byTop") favPosts = from post in favPosts orderby post.UpVotes select post;
+            IQueryable < DogePost > favPosts = null;
+            TempData["CurrentSort"] = sortOrder;
+            
+            
+            if (sortOrder == "byNew" || sortOrder == null)
+            {
+                favPosts = (from p in _db.Posts
+                            select p).Include(u => u.Users).OrderBy(p=> p.AddDate);                
+            }
+
+            if (sortOrder == "byTop")
+            {
+                favPosts = (from p in _db.Posts
+                            select p).Include(u => u.Users).OrderBy(p => p.UpVotes);
+            }
 
           
             var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
 
-            //pics can be HECKING BIG
-            //I'm not sure if it will be async
-            //lets do it on next step
+            
             List<DogePostForUser> lt = new List<DogePostForUser>();
+            DogeUser currentUser = null;
+            var claimsId = (ClaimsIdentity)User.Identity;
+            var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
+            if (cl != null)
+            {
+                var userId = cl.Value;
+                currentUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
+            }
 
             foreach (var item in paginatedDoges)
             {
+                bool postIsFavorited = currentUser == null ? false : item.Users.Any(user => currentUser == user.DogeUser);
+                bool postWasLiked = false;
+                if (TempData.ContainsKey("post" + item.Id))
+                {
+                    postWasLiked = bool.Parse(TempData.Peek("post" + item.Id.ToString()).ToString());
+                }
+
                 item.DogeImage = await _db.Images.FirstOrDefaultAsync(im => im.Post == item);
                 lt.Add(new DogePostForUser
                 {
                     Post = item,
-                    WasFavorited = true,
-                    WasLiked = false //well it's a small loophole to abuse
+                    WasFavorited = postIsFavorited,
+                    WasLiked = postWasLiked
                 });
             }
             paginatedDoges.Posts = lt;
@@ -216,12 +233,12 @@ namespace Doge.Controllers
             return View(paginatedDoges);
         }
 
-      
+        #region likes
         string userKey = "CurrentAnonUser";
         public async Task<IActionResult> LikePost(int postId)
         {
             //anonymous user can like post, so need to keep likes from abuse
-
+            
             if (!TempData.ContainsKey(userKey))
             {
                 //anon user liked some post for the first time
@@ -235,66 +252,101 @@ namespace Doge.Controllers
             if (!TempData.ContainsKey("post"+postId.ToString()))
             {
                 //user did not press it, so it's a like!
-                TempData.Add("post" + postId.ToString(), "1");
+                TempData.Add("post" + postId.ToString(), "true");
                 post.UpVotes += 1;
+                TempData.Keep();
             }
             else
             {
+               var postWasLiked = bool.Parse(TempData["post" + post.Id.ToString()].ToString());
+
+                
                 //user disliked the post after like
-                TempData["post" + postId.ToString()]= "0";
-                post.UpVotes -= 1;
+                TempData["post" + postId.ToString()]= (!postWasLiked).ToString();
+                if (postWasLiked) post.UpVotes -= 1;
+                else post.UpVotes += 1;
             }
 
             await _db.SaveChangesAsync();
 
             //need to return on index with same filter
+           
             return RedirectToAction("Index", TempData[orderKey]);
         }
 
-        [Authorize]
-        public async Task<IActionResult> FavoritePost(int postId)
+        public async Task<string> LikePost2(int postId)
         {
-            var claimsId = (ClaimsIdentity)User.Identity;
-            var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
-            var userId = cl.Value;
-            var dbUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);          
-            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == postId);
-
-            //user wants to unfavorite it?
-            if (post.Users.Any(up => up.DogePost == post))
+            //anonymous user can like post, so need to keep likes from abuse
+            using (var scope = scopeFactory.CreateScope())
             {
-                var userPost = post.Users.First(up => up.DogePost == post);
-                post.Users.Remove(userPost);
-                return RedirectToAction("Index", TempData[orderKey]);
-            }
+                var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            AddPostToFavorites(post);
-            await _db.SaveChangesAsync();
-            return RedirectToAction("Index", TempData[orderKey]);
+                if (!TempData.ContainsKey(userKey))
+                {
+                    //anon user liked some post for the first time
+                    Guid temp = Guid.NewGuid();
+                    TempData.Add(userKey, temp.ToString());
+                }
+
+                var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+
+                //button is a toggle state, so let's check if user already pressed it
+                if (!TempData.ContainsKey("post" + postId.ToString()))
+                {
+                    //user did not press it, so it's a like!
+                    TempData.Add("post" + postId.ToString(), "true");
+                    post.UpVotes += 1;
+                    TempData.Keep();
+                    await _context.SaveChangesAsync();
+                    return "false";
+                }
+                else
+                {
+                    var postWasLiked = bool.Parse(TempData["post" + post.Id.ToString()].ToString());
+
+
+                    //user disliked the post after like
+                    TempData["post" + postId.ToString()] = (!postWasLiked).ToString();
+                    if (postWasLiked) post.UpVotes -= 1;
+                    else post.UpVotes += 1;
+
+                    await _context.SaveChangesAsync();
+                    return postWasLiked.ToString().ToLower() ;
+                }
+            }
         }
+        #endregion
+
+      
 
         [Authorize]
-        public async Task<IActionResult> FavoritePostFromFav(int postId)
+        public async Task<string> FavoritePost(int postId)
         {
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
             var userId = cl.Value;
             var dbUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
-            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+          
+            var post = await (from p in _db.Posts where p.Id == postId select p).
+                Include(u => u.Users).FirstOrDefaultAsync();
 
             //user wants to unfavorite it?
             if (post.Users.Any(up => up.DogePost == post))
             {
                 var userPost = post.Users.First(up => up.DogePost == post);
                 post.Users.Remove(userPost);
-                return RedirectToAction("UserFavorites" );
+                await _db.SaveChangesAsync();
+                return "true";
             }
 
-            AddPostToFavorites(post);
-            await _db.SaveChangesAsync();
-            return RedirectToAction("UserFavorites");
-        }
+            UserPost _up = new UserPost { DogePost = post, DogeUser = dbUser };
+            post.Users.Add(_up);
 
+          
+            await _db.SaveChangesAsync();
+            return "false";
+        }
+              
         public IActionResult Privacy()
         {
             return View();

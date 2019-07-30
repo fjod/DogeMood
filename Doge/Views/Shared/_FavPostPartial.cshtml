@@ -2,32 +2,34 @@
 
 
 <div class="card border-info">
-    <img class="card-img-top"
-         @{ string imgsrc = ""; if (Model.Post.DogeImage.URL.Length > 0) { imgsrc = Model.Post.DogeImage.URL; } else { var b64 = Convert.ToBase64String(Model.Post.DogeImage.Image); imgsrc = string.Format("data:image/jpg;base64,{0}", b64); } }
-         src="@imgsrc">
-
+    <input hidden id="postId" value="@Model.Post.Id" />
+    <div>
+        <img class="card-img-top img-fluid"
+             @{ string imgsrc = ""; if (Model.Post.DogeImage.URL.Length > 0) { imgsrc = Model.Post.DogeImage.URL; } else { var b64 = Convert.ToBase64String(Model.Post.DogeImage.Image); imgsrc = string.Format("data:image/jpg;base64,{0}", b64); } }
+             src="@imgsrc">
+    </div>
     <div class="card-body">
-        @{           
+        @{        
 
             bool fav = Model.WasFavorited;
             string _fav = fav.ToString().ToLower();
             string favText = "Favorite";
-            string _favActive = "active";
-            if (!fav)
+            string _favActive = "";
+            if (fav)
             {
                 favText = "Unfavorite";
-                _favActive = "";
+                _favActive = "active";
             }
-        }
-        <div class="text-center">
-             
-            <button type="button" class="btn btn-primary @_favActive"
-                    data-toggle="button" aria-pressed="@_fav"
-                    autocomplete="off"
-                    asp-action="FavoritePostFromFav" asp-route-postId="@Model.Post.Id">
 
+      
+            string _fb = "favButton" + Model.Post.Id.ToString();
+        }
+        <div class="text-center">        
+
+            <a id="@_fb" class="btn btn-primary @_favActive"
+               aria-pressed="@_fav">
                 @favText
-            </button>
+            </a>
 
             <button type="button" class="btn btn-info">
                 Share
@@ -36,3 +38,5 @@
         </div>
     </div>
 </div>
+
+

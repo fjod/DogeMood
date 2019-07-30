@@ -12,11 +12,16 @@ namespace Doge.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            //Database.ExecuteSqlCommand(@"CREATE VIEW DogePictograms AS 
+            //                                SELECT c.Id AS Id, c.Pictogram AS Pictogram
+            //                                FROM DogeImages c");
         }
 
         public DbSet<DogePost> Posts { get; set; }
         public DbSet<DogeUser> DogeUsers { get; set; }
         public DbSet<DogeImage> Images { get; set; }
+
+       // public DbQuery<Doge.Areas.Admin.Models.DogePictogram> DogePictograms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +44,8 @@ namespace Doge.Data
             //        .HasOne(a => a.DogePost)
             //        .WithOne(b => b.DogeImage)
             //        .HasForeignKey<DogePost>(b => b.DogePostRef);
+
+           
         }
 
         public DbSet<Doge.Models.UserPost> UserPost { get; set; }

@@ -14,3 +14,80 @@
 {"@t":"2019-07-28T09:12:56.6777492Z","@mt":"https://i.redd.it/oext811f2zc31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
 {"@t":"2019-07-28T09:12:56.6778274Z","@mt":"https://i.redd.it/ww8xxs5p6uc31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
 {"@t":"2019-07-28T09:12:56.6778987Z","@mt":"https://imgur.com/QA5wmpx","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:42.6659147Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.0552333Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2670946Z","@mt":"https://i.redd.it/okgjrw2zj3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2676731Z","@mt":"https://v.redd.it/tc8a5z4xp4d31","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2677515Z","@mt":"https://i.redd.it/q2a6fb0ea3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2678213Z","@mt":"https://v.redd.it/vxbtji68l3d31","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2678950Z","@mt":"https://i.redd.it/ubq99yjjs4d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2679598Z","@mt":"https://i.redd.it/lqjtw1gw63d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2680319Z","@mt":"https://i.redd.it/3bn66fw5j0d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2681011Z","@mt":"https://i.redd.it/2xbludogr3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:41:47.2681659Z","@mt":"https://i.redd.it/5r6j8vxb02d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:44:58.6648407Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2326961Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2852773Z","@mt":"https://i.redd.it/okgjrw2zj3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2859212Z","@mt":"https://i.redd.it/q2a6fb0ea3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2860105Z","@mt":"https://i.redd.it/ubq99yjjs4d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2861306Z","@mt":"https://i.redd.it/lqjtw1gw63d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2862056Z","@mt":"https://i.redd.it/3bn66fw5j0d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2862748Z","@mt":"https://i.redd.it/2xbludogr3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:01.2863548Z","@mt":"https://i.redd.it/5r6j8vxb02d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:24.5967738Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:24.6578159Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.3241604Z","@mt":"saved images to database","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7063709Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7092779Z","@mt":"https://i.redd.it/okgjrw2zj3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7093711Z","@mt":"https://i.redd.it/q2a6fb0ea3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7094363Z","@mt":"https://i.redd.it/ubq99yjjs4d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7095094Z","@mt":"https://i.redd.it/lqjtw1gw63d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7095884Z","@mt":"https://i.redd.it/3bn66fw5j0d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7096519Z","@mt":"https://i.redd.it/2xbludogr3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T05:45:25.7097548Z","@mt":"https://i.redd.it/5r6j8vxb02d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T12:13:02.4390403Z","@mt":"created new account for DogeAdminwith email fourjustoneday@yandex.ru","SourceContext":"Doge.Areas.Identity.Pages.Account.RegisterModel"}
+{"@t":"2019-07-29T13:43:50.0415536Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:44:39.5611030Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:45:57.1980066Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:46:00.0392538Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:15.2737673Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:18.0485280Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:40.5243633Z","@mt":"https://i.redd.it/ubq99yjjs4d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:40.9442576Z","@mt":"https://i.redd.it/okgjrw2zj3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:41.2444898Z","@mt":"https://i.redd.it/q2a6fb0ea3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:41.5379937Z","@mt":"https://i.redd.it/lqjtw1gw63d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:41.8457829Z","@mt":"https://i.redd.it/2xbludogr3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:42.1229922Z","@mt":"https://i.redd.it/5r6j8vxb02d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:42.3987849Z","@mt":"https://i.redd.it/66yho94132d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:48:42.9457482Z","@mt":"saved images to database","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:17.8448753Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:20.4586931Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:21.7815018Z","@mt":"https://i.redd.it/ubq99yjjs4d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:22.1125911Z","@mt":"https://i.redd.it/okgjrw2zj3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:22.4142135Z","@mt":"https://i.redd.it/q2a6fb0ea3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:22.7143581Z","@mt":"https://i.redd.it/lqjtw1gw63d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:23.0354426Z","@mt":"https://i.redd.it/2xbludogr3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:23.3553848Z","@mt":"https://i.redd.it/5r6j8vxb02d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:23.6542527Z","@mt":"https://i.redd.it/66yho94132d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:52:24.3114943Z","@mt":"saved images to database","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:54.0982946Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:57.0343373Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:57.3549351Z","@mt":"https://i.redd.it/ubq99yjjs4d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:57.6617328Z","@mt":"https://i.redd.it/okgjrw2zj3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:57.9837061Z","@mt":"https://i.redd.it/q2a6fb0ea3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:58.2567831Z","@mt":"https://i.redd.it/lqjtw1gw63d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:58.5396017Z","@mt":"https://i.redd.it/2xbludogr3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:58.8203060Z","@mt":"https://i.redd.it/5r6j8vxb02d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:59.0984431Z","@mt":"https://i.redd.it/66yho94132d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T13:57:59.6841356Z","@mt":"saved images to database","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:42.1496792Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:44.9574630Z","@mt":"https://i.redd.it/k5mqn855y1d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:45.3111312Z","@mt":"https://i.redd.it/ubq99yjjs4d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:45.5959181Z","@mt":"https://i.redd.it/okgjrw2zj3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:45.9120706Z","@mt":"https://i.redd.it/q2a6fb0ea3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:46.2010823Z","@mt":"https://i.redd.it/lqjtw1gw63d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:46.4686937Z","@mt":"https://i.redd.it/2xbludogr3d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:46.7867084Z","@mt":"https://i.redd.it/5r6j8vxb02d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:47.1155189Z","@mt":"https://i.redd.it/66yho94132d31.jpg","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-29T14:00:47.8111767Z","@mt":"saved images to database","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-07-30T06:54:07.6626988Z","@mt":"created new account for DogeAdminwith email fourjustoneday@yandex.ru","SourceContext":"Doge.Areas.Identity.Pages.Account.RegisterModel"}

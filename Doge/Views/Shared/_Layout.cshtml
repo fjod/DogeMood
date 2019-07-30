@@ -1,4 +1,7 @@
 ﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,9 +24,9 @@
 
     @Html.Raw(JavaScriptSnippet.FullScript)
 
-    <link href="~/sweetAlert/sweetalert.css" rel="stylesheet" />
+    <link href="~/css/sweetalert.css" rel="stylesheet" />
     <script src="~/sweetAlert/sweetalert.min.js"></script>
-
+    <link href="~/css/card.css" rel="stylesheet" />
 
 
 </head>
@@ -54,18 +57,25 @@
                                asp-controller="Home" asp-action="UploadNewDoge">UploadImage</a>
                         </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Admin Area
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" asp-area="Admin"
-                                   asp-controller="DogeImages" asp-action="Index">Index images</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="#">Something else here</a>
-                            </div>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark"
+                               asp-area="User"
+                               asp-controller="Home" asp-action="UserFavorites">Favorite Doggos!</a>
                         </li>
-
+                        @if (User.IsInRole(Doge.Utils.UserRoles.DogeAdmin))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Admin Area
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" asp-area="Admin"
+                                       asp-controller="DogeImages" asp-action="Index">Index images</a>
+                                    <a class="dropdown-item" href="#">Another action</a>
+                                    <a class="dropdown-item" href="#">Something else here</a>
+                                </div>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -107,7 +117,7 @@
         </script>
     </environment>
     <script src="~/js/site.js" asp-append-version="true"></script>
-   
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

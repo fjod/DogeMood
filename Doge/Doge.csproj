@@ -5,10 +5,12 @@
    
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <UserSecretsId>fba2c20a-0e78-4b73-b317-14fdd1711960</UserSecretsId>
+    <UserSecretsId>aspnet-Doge-628327E0-E129-4852-AF23-E75B9B639836</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\20190724111548_identity.cs" />
+    <Compile Remove="Data\Migrations\20190724111548_identity.Designer.cs" />
     <Compile Remove="Data\Migrations\20190728091420_url_in_image.cs" />
     <Compile Remove="Data\Migrations\20190728091420_url_in_image.Designer.cs" />
     <Compile Remove="Data\Migrations\20190728091730_url_in_image.cs" />
@@ -33,7 +35,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Areas\User\Data\" />
     <Folder Include="logs\" />
   </ItemGroup>

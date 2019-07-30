@@ -14,14 +14,23 @@
 }
 
 <div class="container-fluid">
+    @{
+        List<string> favButtons = new List<string>();
+        List<int> ids = new List<int>();
+    }
+
     <div class="row">
         <div class="row">
-            @foreach (var product in Model.Posts)
+            @foreach (var item in Model.Posts)
             {
 
+                string _fb = "favButton" + item.Post.Id.ToString();
+                favButtons.Add(_fb);
+                ids.Add(item.Post.Id);
+
                 <div class="col-md-6 pb-3">
-                    <partial name="_PostPartial"
-                             model="@product" />
+                    <partial name="_FavPostPartial"
+                             model="@item" />
                 </div>
             }
         </div>
@@ -42,3 +51,47 @@
 
 
 
+<script type="text/javascript">
+
+    window.addEventListener("load", function() {
+         @{
+            List<string> resultFavButtons = new List<string> { "","","","" };         
+            List<int> resultIds = new List<int>{ 0,0,0,0 };
+
+
+             for (int i = 0; i < Model.Posts.Count; i++)
+             {
+                 resultFavButtons[i] = (favButtons[i]);
+                 resultIds[i] = (ids[i]);
+             }
+
+        }
+
+        document.getElementById('@resultFavButtons[0]').
+            addEventListener('click', function () { FavClick(@resultIds[0],@resultFavButtons[0]); }, false);
+        document.getElementById('@resultFavButtons[1]').
+            addEventListener('click', function () { FavClick(@resultIds[1],@resultFavButtons[1]); }, false);
+        document.getElementById('@resultFavButtons[2]').
+            addEventListener('click', function () { FavClick(@resultIds[2],@resultFavButtons[2]); }, false);
+        document.getElementById('@resultFavButtons[3]').
+            addEventListener('click', function () { FavClick(@resultIds[3],@resultFavButtons[3]); }, false);
+
+
+        });
+
+    function FavClick(id, name) {
+
+         var url = '@Url.Content("~/")' + "User/Home/FavoritePost";
+        $.get(url,  { postId: id } , function (ret) {
+            if (ret == "false") {
+                name.classList.remove("active");
+                name.textContent = "UnFavorite";
+            }
+            if (ret == "true") {
+                name.classList.add("active");
+                name.textContent = "Favorite";
+            }
+        });
+
+    }
+</script>

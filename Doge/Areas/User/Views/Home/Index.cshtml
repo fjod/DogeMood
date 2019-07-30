@@ -21,9 +21,23 @@
 
 <div class="container-fluid">
     <div class="row">
+        @{ 
+            List<string> likeButtons = new List<string>();
+            List<string> favButtons = new List<string>();
+            List<int> ids = new List<int>();
+        }
         <div class="row">
-            @foreach (var item in Model)
-            {
+            @foreach (var item in Model.Posts)
+        {
+
+
+            string _lb = "likeButton" + item.Post.Id.ToString();
+            string _fb = "favButton" + item.Post.Id.ToString();
+
+            likeButtons.Add(_lb);
+            favButtons.Add(_fb);
+
+            ids.Add(item.Post.Id);
 
                 <div class="col-md-6 pb-3">
                     <partial name="_PostPartial"
@@ -36,15 +50,96 @@
     <a asp-action="Index"
        asp-route-sortOrder="@ViewData["CurrentSort"]"
        asp-route-pageNumber="@(Model.PageIndex - 1)"
-       class="btn btn-default @prevDisabled">
+       class="btn btn-success @prevDisabled">
         Previous
     </a>
     <a asp-action="Index"
        asp-route-sortOrder="@ViewData["CurrentSort"]"
        asp-route-pageNumber="@(Model.PageIndex + 1)"
-       class="btn btn-default @nextDisabled">
+       class="btn btn-success @nextDisabled">
         Next
     </a>
 
 </div>
 
+<script type="text/javascript">
+
+    window.addEventListener("load", function() {
+         @{           
+                 //might be less than 4 posts
+                 List<string> resultFavButtons = new List<string> { "","","","" };         
+
+                 List<string> resultLikeButtons = new List<string>{ "","","","" };                
+
+                 List<int> resultIds = new List<int>{ 0,0,0,0 };
+                
+
+
+                 for (int i = 0; i < Model.Posts.Count; i++)
+                 {
+                     resultFavButtons[i] = (favButtons[i]);
+                     resultLikeButtons[i] = (likeButtons[i]);
+                     resultIds[i] = (ids[i]);
+
+
+                 }
+             }
+
+             document.getElementById('@resultFavButtons[0]').
+            addEventListener('click', function () { FavClick(@resultIds[0],@resultFavButtons[0]); }, false);
+        document.getElementById('@resultFavButtons[1]').
+            addEventListener('click', function () { FavClick(@resultIds[1],@resultFavButtons[1]); }, false);
+        document.getElementById('@resultFavButtons[2]').
+            addEventListener('click', function () { FavClick(@resultIds[2],@resultFavButtons[2]); }, false);
+        document.getElementById('@resultFavButtons[3]').
+            addEventListener('click', function () { FavClick(@resultIds[3],@resultFavButtons[3]); }, false);
+
+        document.getElementById('@resultLikeButtons[0]').
+            addEventListener('click', function () { LikeClick(@resultIds[0],@resultLikeButtons[0]); }, false);
+        document.getElementById('@resultLikeButtons[1]').
+            addEventListener('click', function () { LikeClick(@resultIds[1],@resultLikeButtons[1]); }, false);
+        document.getElementById('@resultLikeButtons[2]').
+            addEventListener('click', function () { LikeClick(@resultIds[2],@resultLikeButtons[2]); }, false);
+        document.getElementById('@resultLikeButtons[3]').
+            addEventListener('click', function () { LikeClick(@resultIds[3],@resultLikeButtons[3]); }, false);
+
+
+        });
+
+   
+
+    function LikeClick(id, name) {
+
+         var url = '@Url.Content("~/")' + "User/Home/LikePost2";
+        $.get(url,  { postId: id } , function (ret) {
+            if (ret == "false") {                
+                name.classList.remove("active");
+                name.textContent = "Unlike";
+            }
+            if (ret == "true") {
+                name.classList.add("active");
+                name.textContent = "Like";
+            }
+        });
+
+    }
+
+    function FavClick(id, name) {
+
+         var url = '@Url.Content("~/")' + "User/Home/FavoritePost";
+        $.get(url,  { postId: id } , function (ret) {
+            if (ret == "false") {                
+                name.classList.remove("active");
+                name.textContent = "UnFavorite";
+            }
+            if (ret == "true") {
+                name.classList.add("active");
+                name.textContent = "Favorite";
+            }
+        });
+
+    }
+
+
+
+</script>

@@ -40,8 +40,9 @@ namespace Doge.Utils
                     target.Save(memoryStream, ImageFormat.Jpeg);
                 }
             }
-
-            return target.ToByteArray(ImageFormat.Jpeg);
+            byte[] ret = target.ToByteArray(ImageFormat.Jpeg);
+            target.Dispose();
+            return ret;
         }
     }
 

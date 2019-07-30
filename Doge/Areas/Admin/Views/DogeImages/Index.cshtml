@@ -1,52 +1,98 @@
-﻿@model IEnumerable<Doge.Models.DogeImage>
+﻿@model Doge.Utils.PaginatedList<DogeImage>
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
 
-<h1>Doges in DataBase</h1>
+<h1>Doges in DogeBase</h1>
 
-           
+
 <p>
-    <a asp-action="Index" asp-route-ShowUnApprovedOnly="true">
-        ShowOnlyUnapproved
-    </a>
-    <a asp-action="Index" >
-        ShowAll
-    </a>
+    <div class="btn btn-group">
+        <a class="btn btn-info" asp-action="Index" asp-route-sortOrder="true">
+            ShowOnlyUnapproved
+        </a>
+        <a class="btn btn-info" asp-action="Index">
+            ShowAll
+        </a>
+    </div>
 </p>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Image)
+                Id
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Pictogram)
+                Pictogram
             </th>
-            <th></th>
+            <th>
+                IsApproved
+            </th>
+            <th>
+                Likes
+            </th>
+            <th>
+                Favorites
+            </th>
+            <th>
+                Actions
+            </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Image)
-                </td>
-                <td>
-                    <img class="card-img-top"
-                         @{ var b64 = Convert.ToBase64String(item.Pictogram); var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); }
-                         src="@imgsrc">
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                <img @{ var b64 = Convert.ToBase64String(item.Pictogram); var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); }
+                     src="@imgsrc">
 
-                </td>
-                <td>                    
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Post.IsApproved)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Post.UpVotes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Post.Users.Count)
+            </td>
+            <td>
+                <div class="btn btn-group">
+                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    @{
+                        if (!item.Post.IsApproved)
+                        {
+                            <a class="btn btn-success" asp-action="Approve" asp-route-id="@item.Id">Approve</a>
+                        }
+                    }
+                </div>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   class="btn btn-success @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   class="btn btn-success @nextDisabled">
+    Next
+</a>

@@ -76,7 +76,7 @@ namespace Doge.Utils
             public string scope { get; set; }
         }
 
-        public List<string> GetPicsUrls()
+        public List<DogeUrls> GetPicsUrls()
         {
             var appId = Configuration["RedditSecretBot:AppId"];
             var Secret = Configuration["RedditSecretBot:Secret"];
@@ -89,13 +89,15 @@ namespace Doge.Utils
             Subreddit sub = reddit.Subreddit("Shiba");
             var posts = sub.Posts.GetTop(new TimedCatSrListingInput(t: "day", limit: 10));   
 
-            List<string> images = new List<string>();
+            List<DogeUrls> images = new List<DogeUrls>();
             if (posts.Any())
             {
                 foreach (Post post in posts)
                 {
                     if (post is LinkPost)
-                        images.Add((post as LinkPost).URL);                    
+                        images.Add(new DogeUrls(
+                        (post as LinkPost).URL, (post as LinkPost).Thumbnail));
+                    
                 }
             }
 
@@ -107,6 +109,19 @@ namespace Doge.Utils
 
     public interface IGetPics
     {
-        List<string> GetPicsUrls();
+        List<DogeUrls> GetPicsUrls();
     }
+
+    public class DogeUrls
+    {
+        public string ImageUrl { get; set; }
+        public string ThumbnailUrl { get; set; }
+        public DogeUrls(string i, string t)
+        {
+            ImageUrl = i;
+            ThumbnailUrl = t;
+        }
+    }
+
+
 }
