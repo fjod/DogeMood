@@ -54,6 +54,18 @@ namespace Doge.Utils
         }
     }
 
+    public static class LogExtensions
+    {
+        public static Doge.Areas.Admin.Controllers.LogEntry Convert(this Serilog.Events.LogEvent reader)
+        {
+            Doge.Areas.Admin.Controllers.LogEntry lt = new Doge.Areas.Admin.Controllers.LogEntry();
+            lt.t = reader.Timestamp;
+            lt.SourceContext = reader.MessageTemplate.Text;
+            lt.mt = reader.Level.ToString();
+            return lt;
+        }
+    }
+
     public class AlertController : Controller
     {
         public void Alert(string message, NotificationType notificationType)

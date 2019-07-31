@@ -1,0 +1,42 @@
+﻿@model List<string>
+@{
+    ViewData["Title"] = "IndexLogs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>IndexLogs</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                LogName
+            </th>
+            <th>
+                Actions
+            </th>           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <h3>@item</h3>
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a class="btn btn-info" asp-action="BrowseLog" asp-route-logName="@item">
+                            Dogelog
+                        </a>
+                        <a class="btn btn-danger" asp-action="DeleteLog" asp-route-logName="@item">
+                            Delet Log
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

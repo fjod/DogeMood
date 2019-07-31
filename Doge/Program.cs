@@ -21,7 +21,7 @@ namespace Doge
                        .MinimumLevel.Override("Microsoft", LogEventLevel.Fatal)
                        .Enrich.FromLogContext()
                        .WriteTo.File(new CompactJsonFormatter(),
-                       "logs\\doge.log",
+                       "wwwroot\\logs\\doge.log",
                        rollingInterval: RollingInterval.Month)
            .CreateLogger();
 

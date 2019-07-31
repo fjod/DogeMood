@@ -29,6 +29,7 @@ namespace Doge.Controllers
        
 
         ApplicationDbContext _db { get; set; }
+
         IHostingEnvironment _env;
         private readonly IServiceScopeFactory scopeFactory;
         public HomeController(ApplicationDbContext db, IHostingEnvironment env, IServiceScopeFactory scope)
@@ -330,11 +331,14 @@ namespace Doge.Controllers
             var post = await (from p in _db.Posts where p.Id == postId select p).
                 Include(u => u.Users).FirstOrDefaultAsync();
 
+
+
             //user wants to unfavorite it?
             if (post.Users.Any(up => up.DogePost == post))
             {
                 var userPost = post.Users.First(up => up.DogePost == post);
                 post.Users.Remove(userPost);
+                post.DogeImage.Image = null; //remove image from DB
                 await _db.SaveChangesAsync();
                 return "true";
             }
@@ -342,8 +346,23 @@ namespace Doge.Controllers
             UserPost _up = new UserPost { DogePost = post, DogeUser = dbUser };
             post.Users.Add(_up);
 
-          
+            //also donwload file and store it in db in case it gets deleted on URL
+            string webRootPath = _env.WebRootPath;
+            var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");         
+
+            using (var client = new WebClient())
+            {
+                client.DownloadFile(post.DogeImage.URL, imagePath);
+            }
+
+            var FavImage = new Bitmap(imagePath);
+            post.DogeImage.Image = FavImage.ToByteArray(ImageFormat.Jpeg);
+
             await _db.SaveChangesAsync();
+
+            FavImage.Dispose();
+            System.IO.File.Delete(imagePath);
+
             return "false";
         }
               

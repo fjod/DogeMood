@@ -5,7 +5,14 @@
     <input hidden id="postId" value="@Model.Post.Id" />
     <div>
         <img class="card-img-top img-fluid"
-             @{ string imgsrc = ""; if (Model.Post.DogeImage.URL.Length > 0) { imgsrc = Model.Post.DogeImage.URL; } else { var b64 = Convert.ToBase64String(Model.Post.DogeImage.Image); imgsrc = string.Format("data:image/jpg;base64,{0}", b64); } }
+             @{ string imgsrc = "";
+                 if (Model.Post.DogeImage.Image!= null)
+            
+                  { var b64 = Convert.ToBase64String(Model.Post.DogeImage.Image);
+                     imgsrc = string.Format("data:image/jpg;base64,{0}", b64); } 
+                 else
+                      { imgsrc = Model.Post.DogeImage.URL; }
+                 }
              src="@imgsrc">
     </div>
     <div class="card-body">

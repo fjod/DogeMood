@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Doge.Data;
 using Doge.Models;
-using System.Drawing;
 using System.IO;
 using Doge.Utils;
+using Microsoft.AspNetCore.Hosting;
+using System.ComponentModel.DataAnnotations;
+using Serilog.Formatting.Compact.Reader;
+using Serilog.Events;
 
 namespace Doge.Areas.Admin.Controllers
 {
@@ -17,10 +19,11 @@ namespace Doge.Areas.Admin.Controllers
     public class DogeImagesController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public DogeImagesController(ApplicationDbContext context)
+        IHostingEnvironment _env;
+        public DogeImagesController(ApplicationDbContext context, IHostingEnvironment env)
         {
             _context = context;
+            _env = env;
         }
         int totalPostOnPage = 10;
         // GET: Admin/DogeImages
@@ -167,6 +170,44 @@ namespace Doge.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index), new { sortOrder = sort, pageNumber = index });
         }
 
-      
+        public IActionResult IndexLogs()
+        {
+            var logPath = _env.WebRootPath + "\\logs";
+            var logs = Directory.GetFiles(logPath).ToList();
+           
+            
+            return View(logs);
+        }
+
+        public IActionResult BrowseLog(string logName)
+        {
+            List<LogEntry> logEntries = new List<LogEntry>();
+            using (var clef = System.IO.File.OpenText(logName))
+            {
+                var reader = new LogEventReader(clef);
+                LogEvent evt;
+                while (reader.TryRead(out evt))
+                    logEntries.Add(evt.Convert());
+            }
+
+               
+            return View(logEntries);
+        }
+
+        public IActionResult DeleteLog(string logName)
+        {
+            System.IO.File.Delete(logName);
+            return RedirectToAction(nameof(IndexLogs));
+        }
     }
+
+    public class LogEntry
+    {
+        [Key]
+        public int MyProperty { get; set; } //scaffolding does not work without key
+        public DateTimeOffset @t { get; set; }
+        public string @mt { get; set; }
+        public string SourceContext { get; set; }
+    }
+  
 }

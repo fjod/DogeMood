@@ -4,6 +4,7 @@ using System.Text;
 using Doge.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Doge.Areas.Admin.Controllers;
 
 namespace Doge.Data
 {
@@ -49,5 +50,7 @@ namespace Doge.Data
         }
 
         public DbSet<Doge.Models.UserPost> UserPost { get; set; }
+
+        public DbSet<Doge.Areas.Admin.Controllers.LogEntry> LogEntry { get; set; }
     }
 }

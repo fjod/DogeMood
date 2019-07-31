@@ -14,6 +14,7 @@ using Doge.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Doge.Utils;
+using GlobalErrorHandling.Extensions;
 
 namespace Doge
 {
@@ -96,12 +97,10 @@ namespace Doge
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseDeveloperExceptionPage();                
             }
             else
-            {
-                app.UseExceptionHandler("/Home/Error");
+            {                
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -111,6 +110,7 @@ namespace Doge
             app.UseCookiePolicy();
             app.UseSession();
             app.UseAuthentication();
+            app.ConfigureExceptionHandler();
 
             app.UseMvc(routes =>
             {
