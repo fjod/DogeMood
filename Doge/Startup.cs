@@ -70,11 +70,22 @@ namespace Doge
 
             services.AddSession(options =>
             {
-                options.Cookie.Name = ".AdventureWorks.Session";
+                options.Cookie.Name = "DogeMood";
                 options.IdleTimeout = TimeSpan.FromSeconds(100);
                 options.Cookie.IsEssential = true;
             });
 
+            services.AddAuthentication()
+                .AddVkontakte(options =>
+                {
+                    options.ClientId = Configuration["VkIds:ClientId"];
+                    options.ClientSecret = Configuration["VkIds:ClientSecret"];
+                }).AddFacebook(options =>
+                  {
+                      options.ClientId = Configuration["FBIds:ClientId"];
+                      options.AppSecret = Configuration["FBIds:AppSecret"];
+                  }
+                ); 
 
             services.AddSingleton<IGetPics, RedditPics>();
             services.AddHostedService<TimedHostedService>();
