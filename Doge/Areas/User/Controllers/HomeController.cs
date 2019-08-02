@@ -28,23 +28,20 @@ namespace Doge.Controllers
     {
        
 
-        ApplicationDbContext _db { get; set; }
+       ApplicationDbContext Db { get; set; }
 
-        IHostingEnvironment _env;
+        readonly IHostingEnvironment _env;
         private readonly IServiceScopeFactory scopeFactory;
         public HomeController(ApplicationDbContext db, IHostingEnvironment env, IServiceScopeFactory scope)
         {
-            _db = db;
+            this.Db = db;
             _env = env;
             scopeFactory = scope;
 
 
         }
 
-        public IActionResult UploadNewDoge()
-        {
-            return View();
-        }
+       
 
        
         public async Task<IActionResult> UserFavorites(int pageNumber = 1)
@@ -53,9 +50,9 @@ namespace Doge.Controllers
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
             var userId = cl.Value;
-            var dbUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
+            var dbUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);
 
-            var favPosts = (from p in _db.Posts
+            var favPosts = (from p in Db.Posts
                             where p.Users.Any(post => post.DogeUser == dbUser)
                             select p);//.Skip(page).Take(totalPostOnPage); //.Include(im => im.DogeImage); 
 
@@ -66,7 +63,7 @@ namespace Doge.Controllers
 
             foreach (var item in paginatedDoges)
             {
-                item.DogeImage = await _db.Images.FirstOrDefaultAsync(im => im.Post == item);
+                item.DogeImage = await Db.Images.FirstOrDefaultAsync(im => im.Post == item);
                 lt.Add(new DogePostForUser
                 {
                     Post = item,
@@ -79,10 +76,9 @@ namespace Doge.Controllers
             return View(paginatedDoges);
         }
 
+        public readonly int totalPostOnPage = 4;
 
-        int totalPostOnPage = 4;
-
-
+        #region upload
         [HttpPost, ActionName("Upload")]
         [ValidateAntiForgeryToken]
         [Authorize]
@@ -118,16 +114,20 @@ namespace Doge.Controllers
 
             byte[] Thumbnail = null;
             byte[] _Image = null;
-
+            Bitmap b1 = null;          
             if (!file.First().FileName.IsNullOrEmpty())
             {
-                Thumbnail = new Bitmap(file.First().FileName).ToThumbnail();
-                _Image = new Bitmap(file.First().FileName).ToByteArray(ImageFormat.Jpeg);
+                b1 = new Bitmap(file.First().FileName);
+                Thumbnail = b1.ToThumbnail();              
+                _Image = b1.ToByteArray(ImageFormat.Jpeg);
+                b1.Dispose();              
             }
             else
             {
-                Thumbnail = new Bitmap(imagePath).ToThumbnail();
-                _Image = new Bitmap(imagePath).ToByteArray(ImageFormat.Jpeg);
+                b1 = new Bitmap(imagePath);               
+                Thumbnail = b1.ToThumbnail();
+                _Image = b1.ToByteArray(ImageFormat.Jpeg);
+                b1.Dispose();               
             }
 
             //as user uploads image, I need to create a post for it
@@ -157,27 +157,29 @@ namespace Doge.Controllers
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
             var userId = cl.Value;
-            var dbUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
+            var dbUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);
 
             UserPost _up = new UserPost { DogePost = post, DogeUser = dbUser };
             post.Users.Add(_up);            
 
             im.Post = post;
 
-            await _db.Images.AddAsync(im);
-            await _db.Posts.AddAsync(post);
-            await _db.SaveChangesAsync();
+            await Db.Images.AddAsync(im);
+            await Db.Posts.AddAsync(post);
+            await Db.SaveChangesAsync();
             
 
             Alert(alertText, NotificationType.success);
             return RedirectToAction("Index"); 
         }
 
-       
+        public IActionResult UploadNewDoge()
+        {
+            return View();
+        }
+        #endregion
 
-        
 
-        string orderKey = "sortOrderKey";        
 
         public async Task<IActionResult> Index(string sortOrder, int pageNumber = 1)
         {        
@@ -188,13 +190,13 @@ namespace Doge.Controllers
             
             if (sortOrder == "byNew" || sortOrder == null)
             {
-                favPosts = (from p in _db.Posts
+                favPosts = (from p in Db.Posts where p.IsApproved
                             select p).Include(u => u.Users).OrderBy(p=> p.AddDate);                
             }
 
             if (sortOrder == "byTop")
             {
-                favPosts = (from p in _db.Posts
+                favPosts = (from p in Db.Posts where p.IsApproved
                             select p).Include(u => u.Users).OrderBy(p => p.UpVotes);
             }
 
@@ -209,7 +211,7 @@ namespace Doge.Controllers
             if (cl != null)
             {
                 var userId = cl.Value;
-                currentUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
+                currentUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);
             }
 
             foreach (var item in paginatedDoges)
@@ -221,7 +223,7 @@ namespace Doge.Controllers
                     postWasLiked = bool.Parse(TempData.Peek("post" + item.Id.ToString()).ToString());
                 }
 
-                item.DogeImage = await _db.Images.FirstOrDefaultAsync(im => im.Post == item);
+                item.DogeImage = await Db.Images.FirstOrDefaultAsync(im => im.Post == item);
                 lt.Add(new DogePostForUser
                 {
                     Post = item,
@@ -235,45 +237,7 @@ namespace Doge.Controllers
         }
 
         #region likes
-        string userKey = "CurrentAnonUser";
-        public async Task<IActionResult> LikePost(int postId)
-        {
-            //anonymous user can like post, so need to keep likes from abuse
-            
-            if (!TempData.ContainsKey(userKey))
-            {
-                //anon user liked some post for the first time
-                Guid temp = Guid.NewGuid();
-                TempData.Add(userKey, temp.ToString());
-            }
-
-            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == postId);
-
-            //button is a toggle state, so let's check if user already pressed it
-            if (!TempData.ContainsKey("post"+postId.ToString()))
-            {
-                //user did not press it, so it's a like!
-                TempData.Add("post" + postId.ToString(), "true");
-                post.UpVotes += 1;
-                TempData.Keep();
-            }
-            else
-            {
-               var postWasLiked = bool.Parse(TempData["post" + post.Id.ToString()].ToString());
-
-                
-                //user disliked the post after like
-                TempData["post" + postId.ToString()]= (!postWasLiked).ToString();
-                if (postWasLiked) post.UpVotes -= 1;
-                else post.UpVotes += 1;
-            }
-
-            await _db.SaveChangesAsync();
-
-            //need to return on index with same filter
-           
-            return RedirectToAction("Index", TempData[orderKey]);
-        }
+        readonly string userKey = "CurrentAnonUser";    
 
         public async Task<string> LikePost2(int postId)
         {
@@ -317,8 +281,7 @@ namespace Doge.Controllers
             }
         }
         #endregion
-
-      
+              
 
         [Authorize]
         public async Task<string> FavoritePost(int postId)
@@ -326,9 +289,9 @@ namespace Doge.Controllers
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
             var userId = cl.Value;
-            var dbUser = _db.DogeUsers.FirstOrDefault(u => u.Id == userId);
+            var dbUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);
           
-            var post = await (from p in _db.Posts where p.Id == postId select p).
+            var post = await (from p in Db.Posts where p.Id == postId select p).
                 Include(u => u.Users).FirstOrDefaultAsync();
 
 
@@ -339,7 +302,7 @@ namespace Doge.Controllers
                 var userPost = post.Users.First(up => up.DogePost == post);
                 post.Users.Remove(userPost);
                 post.DogeImage.Image = null; //remove image from DB
-                await _db.SaveChangesAsync();
+                await Db.SaveChangesAsync();
                 return "true";
             }
 
@@ -358,7 +321,7 @@ namespace Doge.Controllers
             var FavImage = new Bitmap(imagePath);
             post.DogeImage.Image = FavImage.ToByteArray(ImageFormat.Jpeg);
 
-            await _db.SaveChangesAsync();
+            await Db.SaveChangesAsync();
 
             FavImage.Dispose();
             System.IO.File.Delete(imagePath);

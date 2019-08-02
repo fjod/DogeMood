@@ -10,10 +10,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.IO;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Doge.Utils
 {
-    internal class TimedHostedService : IHostedService, IDisposable
+    public class TimedHostedService : IHostedService, IDisposable
     {
         private Timer _timer;
 
@@ -39,12 +40,12 @@ namespace Doge.Utils
 
         private void DoWork(object state)
         {
-            return;
+          
             Log.ForContext<TimedHostedService>().Information("Downloading pics from Reddit..");
             using (var scope = scopeFactory.CreateScope())
             {
-                var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                var _env = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();
+                var _context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+                var _env = scope.ServiceProvider.GetService<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();
 
 
                 //these pics are not favorited, so we store URLs only
@@ -52,7 +53,8 @@ namespace Doge.Utils
                 var pics = pictures.GetPicsUrls();
                 //https://i.imgur.com/QA5wmpx.jpg
                 pics.ForEach(p =>
-                {   
+                {
+                    Debug.WriteLine(p.ToString());
                     //little conversin for imgur
                     if (p.ImageUrl.Contains("imgur"))
                     {
