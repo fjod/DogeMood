@@ -25,16 +25,18 @@ namespace Doge.Areas.Admin.Controllers
             _context = context;
             _env = env;
         }
-        int totalPostOnPage = 10;
+        int totalPostOnPage = 20;
         // GET: Admin/DogeImages
         public async Task<IActionResult> Index(string sortOrder = "", int pageNumber = 1)
         {
             ViewData["PageIndex"] = pageNumber.ToString();
             PaginatedList<DogeImage> pages;
             if (sortOrder == "true")
-            {
+            { //https://www.reddit.com/r/dotnet/comments/cl8s26/im_really_bad_at_linq/
+                
                 ViewData["CurrentSort"] = "true";
                 var dogesThumbnails =
+                                        
                                         from img in _context.Images
                                         join post in _context.Posts
                                         on img.Post equals post
@@ -61,12 +63,10 @@ namespace Doge.Areas.Admin.Controllers
             {
                 ViewData["CurrentSort"] = "";
                 var dogesThumbnails =
-                                      
 
                                        from img in _context.Images
                                        join post in _context.Posts
                                        on img.Post equals post
-
 
                                        let tempPost = new DogePost
                                        {
@@ -81,6 +81,8 @@ namespace Doge.Areas.Admin.Controllers
                                            Pictogram = img.Pictogram,
                                            Post = tempPost
                                        };
+
+                //var db2 = _context.Images.Select(p => new DogeImage { Id = p.Id, Pictogram = p.Pictogram }).Include(im => im.Post);
 
 
                 pages = await PaginatedList<DogeImage>.CreateAsync(dogesThumbnails, pageNumber, totalPostOnPage);

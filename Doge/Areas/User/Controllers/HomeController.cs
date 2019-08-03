@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Headers;
 
 namespace Doge.Controllers
 {
@@ -103,27 +104,39 @@ namespace Doge.Controllers
 
 
 
-            string webRootPath = _env.WebRootPath;
-            var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");
-
-            using (var client = new WebClient())
-            {
-                client.DownloadFile(_doge.DogeURL, imagePath);
-            }
-
-
             byte[] Thumbnail = null;
             byte[] _Image = null;
             Bitmap b1 = null;          
             if (!file.First().FileName.IsNullOrEmpty())
             {
-                b1 = new Bitmap(file.First().FileName);
+                var filePath = Path.GetTempFileName();
+
+                
+                    if (file.First().Length > 0)
+                    {
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.First().CopyToAsync(stream);
+                        }
+                    }
+                
+
+                b1 = new Bitmap(filePath);
                 Thumbnail = b1.ToThumbnail();              
                 _Image = b1.ToByteArray(ImageFormat.Jpeg);
-                b1.Dispose();              
+                b1.Dispose();
+                System.IO.File.Delete(filePath);
             }
             else
             {
+                string webRootPath = _env.WebRootPath;
+                var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");
+
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile(_doge.DogeURL, imagePath);
+                }
+
                 b1 = new Bitmap(imagePath);               
                 Thumbnail = b1.ToThumbnail();
                 _Image = b1.ToByteArray(ImageFormat.Jpeg);
@@ -146,13 +159,14 @@ namespace Doge.Controllers
                 UpVotes = 0
             };
 
-            string alertText = "File uploaded, wait for moderator to approve it";
 
+            string alertText = "File uploaded, wait for moderator to approve it";
             if (User.IsInRole(UserRoles.DogeAdmin))
             {
                 post.IsApproved = true;
                 alertText = "File uploaded";
             }
+            
 
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
@@ -160,14 +174,14 @@ namespace Doge.Controllers
             var dbUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);
 
             UserPost _up = new UserPost { DogePost = post, DogeUser = dbUser };
-            post.Users.Add(_up);            
+            post.Users = new List<UserPost> { _up };
 
             im.Post = post;
 
             await Db.Images.AddAsync(im);
             await Db.Posts.AddAsync(post);
             await Db.SaveChangesAsync();
-            
+
 
             Alert(alertText, NotificationType.success);
             return RedirectToAction("Index"); 
