@@ -1,4 +1,4 @@
-﻿@model Doge.Models.DogeImage
+﻿@model Doge.Models.DogeBigImage
 
 @{
     ViewData["Title"] = "Details";
@@ -25,7 +25,7 @@
                      }
                      else
                      {
-                         imgsrc = Model.URL;
+                         imgsrc = Model.DogeSmallImage.URL;
                      }
                  }
                      src="@imgsrc">
@@ -34,6 +34,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Index">Back to List</a>
-    <a asp-action="Approve" asp-route-id="Id">Approve</a>
+    <a class="btn btn-success" asp-action="Index">Back to List</a>
+    <a class="btn btn-info" asp-action="Approve" asp-route-id="Id">Approve</a>
 </div>

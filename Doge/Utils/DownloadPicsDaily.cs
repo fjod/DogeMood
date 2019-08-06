@@ -40,7 +40,7 @@ namespace Doge.Utils
 
         private void DoWork(object state)
         {
-            return;
+            
             Log.ForContext<TimedHostedService>().Information("Downloading pics from Reddit..");
             using (var scope = scopeFactory.CreateScope())
             {
@@ -65,7 +65,8 @@ namespace Doge.Utils
 
                 //https://v.redd.it/tc8a5z4xp4d31
                 pics.RemoveAll(p => p.ImageUrl.Contains("v.redd.it", StringComparison.Ordinal)); //delet all videos
-
+                pics.RemoveAll(p => !p.ImageUrl.EndsWith(".jpg", StringComparison.Ordinal));
+                pics.RemoveAll(p => !p.ImageUrl.EndsWith(".png", StringComparison.Ordinal));
                 pics.ForEach(pic =>
                 {
                     string webRootPath = _env.WebRootPath;
@@ -79,10 +80,11 @@ namespace Doge.Utils
                     Bitmap bp = new Bitmap(imagePath);
                     byte[] Thumbnail = bp.ToThumbnail();
 
-                    DogeImage im = new DogeImage
+                    DogeSmallImage im = new DogeSmallImage
                     {
                         URL = pic.ImageUrl,
-                        Pictogram = Thumbnail                        
+                        Pictogram = Thumbnail,
+                        DogeBigImage = new DogeBigImage()
                     };
                     DogePost post = new DogePost
                     {
@@ -95,16 +97,15 @@ namespace Doge.Utils
 
                     Log.ForContext<TimedHostedService>().Information(pic.ImageUrl);
 
-                    _context.Images.Add(im);
+                    _context.SmallImages.Add(im);
                     _context.Posts.Add(post);
 
                     bp.Dispose();
                     File.Delete(Path.Combine(webRootPath, "images\\tempDoge.jpg"));
                 });
 
-
                 _context.SaveChanges();
-            } 
+            }
             Log.ForContext<TimedHostedService>().Information("saved images to database");
         }
 

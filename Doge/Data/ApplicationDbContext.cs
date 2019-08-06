@@ -20,13 +20,15 @@ namespace Doge.Data
 
         public DbSet<DogePost> Posts { get; set; }
         public DbSet<DogeUser> DogeUsers { get; set; }
-        public DbSet<DogeImage> Images { get; set; }
+       // public DbSet<DogeImage> Images { get; set; }
 
-       // public DbQuery<Doge.Areas.Admin.Models.DogePictogram> DogePictograms { get; set; }
+        public DbSet<DogeBigImage> BigImages { get; set; }
+        public DbSet<DogeSmallImage> SmallImages { get; set; }
+        // public DbQuery<Doge.Areas.Admin.Models.DogePictogram> DogePictograms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+           
 
             modelBuilder.Entity<UserPost>()
                .HasKey(_userPost => new { _userPost.UserId, _userPost.PostId });
@@ -46,7 +48,18 @@ namespace Doge.Data
             //        .WithOne(b => b.DogeImage)
             //        .HasForeignKey<DogePost>(b => b.DogePostRef);
 
-           
+            modelBuilder.Entity<DogeBigImage>().
+                HasOne(p => p.DogeSmallImage).
+                WithOne(p => p.DogeBigImage).
+                HasForeignKey<DogeBigImage>(p => p.Id);
+            modelBuilder.Entity<DogeSmallImage>().
+                HasOne(p => p.DogeBigImage).WithOne(p => p.DogeSmallImage).
+                HasForeignKey<DogeSmallImage>(p => p.Id);
+
+            modelBuilder.Entity<DogeBigImage>().ToTable("Images");
+            modelBuilder.Entity<DogeSmallImage>().ToTable("Images");
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Doge.Models.UserPost> UserPost { get; set; }

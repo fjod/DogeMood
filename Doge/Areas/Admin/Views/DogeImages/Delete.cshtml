@@ -1,4 +1,4 @@
-﻿@model Doge.Models.DogeImage
+﻿@model Doge.Models.DogeBigImage
 
 @{
     ViewData["Title"] = "Delete";
@@ -25,7 +25,7 @@
                      }
                      else
                      {
-                         imgsrc = Model.URL;
+                         imgsrc = Model.DogeSmallImage.URL;
                      }
                   }
                  src="@imgsrc">

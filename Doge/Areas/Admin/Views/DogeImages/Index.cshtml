@@ -1,4 +1,4 @@
-﻿@model Doge.Utils.PaginatedList<DogeImage>
+﻿@model Doge.Utils.PaginatedList<DogeSmallImage>
 
 @{
     ViewData["Title"] = "Index";
@@ -14,7 +14,7 @@
 
 <p>
     <div class="btn btn-group">
-        <a class="btn btn-info" asp-action="Index" asp-route-sortOrder="true">
+        <a class="btn btn-info" asp-action="Index" asp-route-sortOrder="UnApprovedOnly">
             ShowOnlyUnapproved
         </a>
         <a class="btn btn-info" asp-action="Index">

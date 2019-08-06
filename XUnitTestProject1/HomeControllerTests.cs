@@ -20,68 +20,12 @@ namespace XUnitTestProject
 {
     public class HomeControllerTests : TestBase
     {
-        readonly Doge.Controllers.HomeController sut;
-        readonly DogeUser currentUser;
+        readonly Doge.Areas.User.Controllers.HomeController sut;
+       
         public HomeControllerTests(ITestOutputHelper output) : base(output)
-        {
-            var user = new DogeUser() { UserName = "JohnDoe", Id = "1" };
-            currentUser = user;
-            _context.DogeUsers.Add(user);
-
-            for (int i = 0; i < 25; i++)
-            {
-                DogeImage im = new DogeImage
-                {
-                    URL = "imageUrl"+i.ToString(),
-                    Pictogram = new byte[i]
-                };
-                DogePost post = new DogePost
-                {
-                    AddDate = DateTime.Now,
-                    DogeImage = im,
-                    IsApproved = i%2==0,
-                    UpVotes = i
-                };
-                im.Post = post;
-                if (i%3 ==0)
-                {
-                    UserPost _up = new UserPost { DogePost = post, DogeUser = user };
-                    post.Users = new List<UserPost>
-                    {
-                        _up
-                    };
-                }
-                post.AddDate.AddDays(i);
-                _context.Images.Add(im);
-                _context.Posts.Add(post);
-            }
-            _context.SaveChanges();
-
-            sut = new Doge.Controllers.HomeController(_context, host, ScopeFactory);
-
-           
-
-            var claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim("name", user.UserName),
-            };
-            var identity = new ClaimsIdentity(claims, "Test");
-            var claimsPrincipal = new ClaimsPrincipal(identity);
-
-            var mockPrincipal = new Mock<IPrincipal>();
-            mockPrincipal.Setup(x => x.Identity).Returns(identity);
-            mockPrincipal.Setup(x => x.IsInRole(It.IsAny<string>())).Returns(true);
-
-            var context = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
-                {
-                    User = claimsPrincipal
-                }
-            };
-
+        {           
+            sut = new Doge.Areas.User.Controllers.HomeController(_dbContext, host, ScopeFactory);
+            
             var tempData = new TempDataDictionary(context.HttpContext,
                 new Mock<ITempDataProvider>().Object);
             sut.TempData = tempData;
@@ -92,8 +36,8 @@ namespace XUnitTestProject
         [Fact]
         public void TestContextToWorkWith()
         {
-            _output.WriteLine(_context.Posts.Count().ToString());
-            Assert.True(_context.Posts.Count() > 0);
+            _output.WriteLine(_dbContext.Posts.Count().ToString());
+            Assert.True(_dbContext.Posts.Count() > 0);
         }
 
         #region index----------------------------------
@@ -108,7 +52,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var sortedByNewFromDb = _context.Posts.OrderBy(p => p.AddDate)
+            var sortedByNewFromDb = _dbContext.Posts.OrderBy(p => p.AddDate)
                 .Where(p=>p.IsApproved).Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
@@ -127,7 +71,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var sortedByNewFromDb = _context.Posts.OrderBy(p => p.UpVotes)
+            var sortedByNewFromDb = _dbContext.Posts.OrderBy(p => p.UpVotes)
                 .Where(p => p.IsApproved).Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
@@ -145,7 +89,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var sortedByNewFromDb = _context.Posts.OrderBy(p => p.AddDate)
+            var sortedByNewFromDb = _dbContext.Posts.OrderBy(p => p.AddDate)
                 .Where(p => p.IsApproved).Skip(sut.totalPostOnPage).Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
@@ -164,7 +108,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var sortedByNewFromDb = _context.Posts.OrderBy(p => p.UpVotes)
+            var sortedByNewFromDb = _dbContext.Posts.OrderBy(p => p.UpVotes)
                 .Where(p => p.IsApproved).Skip(sut.totalPostOnPage).Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
@@ -184,7 +128,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var favPosts = (from p in _context.Posts
+            var favPosts = (from p in _dbContext.Posts
                             where p.Users.Any(post => post.DogeUser == currentUser)
                             select p).Skip(0).Take(sut.totalPostOnPage).ToList();
 
@@ -204,7 +148,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var favPosts = (from p in _context.Posts
+            var favPosts = (from p in _dbContext.Posts
                             where p.Users.Any(post => post.DogeUser == currentUser)
                             select p).Skip(sut.totalPostOnPage).Take(sut.totalPostOnPage).ToList();
 
@@ -218,7 +162,7 @@ namespace XUnitTestProject
         [Fact]
         public async void TestLikes()
         {
-            var post = _context.Posts.Take(1).First();
+            var post = _dbContext.Posts.Take(1).First();
             var initialLikes = post.UpVotes;
 
             await sut.LikePost2(post.Id);
@@ -233,20 +177,20 @@ namespace XUnitTestProject
         public async void TestFavoritePost()
         {
             //some posts are already favorited so must find unfavorited one
-            var post = _context.Posts.Skip(1).Take(1).First();
+            var post = _dbContext.Posts.Skip(1).Take(1).First();
             //must provide valid link for webclient to download it
             post.DogeImage.URL = "https://picsum.photos/id/553/200/300.jpg";
-            _context.SaveChanges();
+            _dbContext.SaveChanges();
 
           
             await sut.FavoritePost(post.Id);           
 
             Assert.Contains(post.Users, up => up.DogeUser == currentUser);
-            Assert.True(post.DogeImage.Image.Count() > 0);
+            Assert.True(post.DogeImage.DogeBigImage.Image.Count() > 0);
 
             await sut.FavoritePost(post.Id);
             Assert.DoesNotContain(post.Users, up => up.DogeUser == currentUser);        
-            Assert.True(post.DogeImage.Image == null);
+            Assert.True(post.DogeImage.DogeBigImage.Image == null);
         }
     }
 }

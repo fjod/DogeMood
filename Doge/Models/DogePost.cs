@@ -20,7 +20,7 @@ namespace Doge.Models
         //one-to-one relation
         [ForeignKey("DogeImage")]
         public int DogeImageFK { get; set; }        
-        public DogeImage DogeImage { get; set; }
+        public DogeSmallImage DogeImage { get; set; }
 
 
         //each user can have multiple favorite posts

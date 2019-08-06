@@ -20,16 +20,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 
-namespace Doge.Controllers
+namespace Doge.Areas.User.Controllers
 {
     
 
     [Area("User")]
     public class HomeController : AlertController
-    {
-       
-
-       ApplicationDbContext Db { get; set; }
+    {  
+        ApplicationDbContext Db { get; set; }
 
         readonly IHostingEnvironment _env;
         private readonly IServiceScopeFactory scopeFactory;
@@ -38,13 +36,8 @@ namespace Doge.Controllers
             this.Db = db;
             _env = env;
             scopeFactory = scope;
+        }     
 
-
-        }
-
-       
-
-       
         public async Task<IActionResult> UserFavorites(int pageNumber = 1)
         {       
 
@@ -55,8 +48,12 @@ namespace Doge.Controllers
 
             var favPosts = (from p in Db.Posts
                             where p.Users.Any(post => post.DogeUser == dbUser)
-                            select p);//.Skip(page).Take(totalPostOnPage); //.Include(im => im.DogeImage); 
+                            select p);
 
+            var favPost = Db.Posts.
+                Include(p => p.DogeImage).
+                ThenInclude(im => im.DogeBigImage).
+                Where(p => p.Users.Any(post => post.DogeUser == dbUser)).AsQueryable();
             
             var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
                        
@@ -64,7 +61,8 @@ namespace Doge.Controllers
 
             foreach (var item in paginatedDoges)
             {
-                item.DogeImage = await Db.Images.FirstOrDefaultAsync(im => im.Post == item);
+                //item.DogeImage = await Db.SmallImages.FirstOrDefaultAsync(im => im.Post == item);
+                //should be done with Includes 
                 lt.Add(new DogePostForUser
                 {
                     Post = item,
@@ -85,7 +83,7 @@ namespace Doge.Controllers
         [Authorize]
         public async Task<IActionResult> UploadNewDogePOST(UploadDoge _doge)
         {
-          
+
             var file = HttpContext.Request.Form.Files;
 
             if (!_doge.DogeURL.IsNullOrEmpty() &&
@@ -106,23 +104,23 @@ namespace Doge.Controllers
 
             byte[] Thumbnail = null;
             byte[] _Image = null;
-            Bitmap b1 = null;          
+            Bitmap b1 = null;
             if (!file.First().FileName.IsNullOrEmpty())
             {
                 var filePath = Path.GetTempFileName();
 
-                
-                    if (file.First().Length > 0)
+
+                if (file.First().Length > 0)
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await file.First().CopyToAsync(stream);
-                        }
+                        await file.First().CopyToAsync(stream);
                     }
-                
+                }
+
 
                 b1 = new Bitmap(filePath);
-                Thumbnail = b1.ToThumbnail();              
+                Thumbnail = b1.ToThumbnail();
                 _Image = b1.ToByteArray(ImageFormat.Jpeg);
                 b1.Dispose();
                 System.IO.File.Delete(filePath);
@@ -137,28 +135,26 @@ namespace Doge.Controllers
                     client.DownloadFile(_doge.DogeURL, imagePath);
                 }
 
-                b1 = new Bitmap(imagePath);               
+                b1 = new Bitmap(imagePath);
                 Thumbnail = b1.ToThumbnail();
                 _Image = b1.ToByteArray(ImageFormat.Jpeg);
-                b1.Dispose();               
+                b1.Dispose();
             }
 
             //as user uploads image, I need to create a post for it
-            //to do pre-moderation
+            //to do pre-moderation                     
 
-            DogeImage im = new DogeImage
-            {
-                Image = _Image,
-                Pictogram = Thumbnail
-            };
+            DogeSmallImage imSmall = new DogeSmallImage
+            { Pictogram = Thumbnail, DogeBigImage = new DogeBigImage { Image = _Image } };
+            
             DogePost post = new DogePost
             {
                 AddDate = DateTime.Now,
-                DogeImage = im,
+                DogeImage = imSmall,
                 IsApproved = false,
                 UpVotes = 0
             };
-
+            
 
             string alertText = "File uploaded, wait for moderator to approve it";
             if (User.IsInRole(UserRoles.DogeAdmin))
@@ -166,7 +162,7 @@ namespace Doge.Controllers
                 post.IsApproved = true;
                 alertText = "File uploaded";
             }
-            
+
 
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
@@ -176,9 +172,9 @@ namespace Doge.Controllers
             UserPost _up = new UserPost { DogePost = post, DogeUser = dbUser };
             post.Users = new List<UserPost> { _up };
 
-            im.Post = post;
+            imSmall.Post = post;
 
-            await Db.Images.AddAsync(im);
+            await Db.SmallImages.AddAsync(imSmall);
             await Db.Posts.AddAsync(post);
             await Db.SaveChangesAsync();
 
@@ -203,15 +199,19 @@ namespace Doge.Controllers
             
             
             if (sortOrder == "byNew" || sortOrder == null)
-            {
-                favPosts = (from p in Db.Posts where p.IsApproved
-                            select p).Include(u => u.Users).OrderBy(p=> p.AddDate);                
+            {                
+                favPosts = Db.Posts.Where(p => p.IsApproved).
+                          Include(post => post.DogeImage).
+                          Include(u => u.Users).
+                          OrderBy(p => p.AddDate);
             }
 
             if (sortOrder == "byTop")
             {
-                favPosts = (from p in Db.Posts where p.IsApproved
-                            select p).Include(u => u.Users).OrderBy(p => p.UpVotes);
+                favPosts = Db.Posts.Where(p=>p.IsApproved).
+                            Include(post=>post.DogeImage).
+                            Include(u => u.Users).
+                            OrderBy(p => p.UpVotes);
             }
 
           
@@ -237,7 +237,7 @@ namespace Doge.Controllers
                     postWasLiked = bool.Parse(TempData.Peek("post" + item.Id.ToString()).ToString());
                 }
 
-                item.DogeImage = await Db.Images.FirstOrDefaultAsync(im => im.Post == item);
+               // item.DogeImage = await Db.SmallImages.FirstOrDefaultAsync(im => im.Post == item);
                 lt.Add(new DogePostForUser
                 {
                     Post = item,
@@ -306,7 +306,7 @@ namespace Doge.Controllers
             var dbUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);
           
             var post = await (from p in Db.Posts where p.Id == postId select p).
-                Include(u => u.Users).FirstOrDefaultAsync();
+                Include(u => u.Users).Include(im=> im.DogeImage).FirstOrDefaultAsync();
 
 
 
@@ -315,7 +315,7 @@ namespace Doge.Controllers
             {
                 var userPost = post.Users.First(up => up.DogePost == post);
                 post.Users.Remove(userPost);
-                post.DogeImage.Image = null; //remove image from DB
+                post.DogeImage.DogeBigImage = null; //remove image from DB
                 await Db.SaveChangesAsync();
                 return "true";
             }
@@ -333,7 +333,7 @@ namespace Doge.Controllers
             }
 
             var FavImage = new Bitmap(imagePath);
-            post.DogeImage.Image = FavImage.ToByteArray(ImageFormat.Jpeg);
+            post.DogeImage.DogeBigImage.Image = FavImage.ToByteArray(ImageFormat.Jpeg);
 
             await Db.SaveChangesAsync();
 

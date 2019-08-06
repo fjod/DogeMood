@@ -19,73 +19,38 @@ namespace Doge.Areas.Admin.Controllers
     public class DogeImagesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        IHostingEnvironment _env;
+        readonly IHostingEnvironment _env;
         public DogeImagesController(ApplicationDbContext context, IHostingEnvironment env)
         {
             _context = context;
             _env = env;
         }
-        int totalPostOnPage = 20;
+        public int totalPostOnPage = 10;
         // GET: Admin/DogeImages
         public async Task<IActionResult> Index(string sortOrder = "", int pageNumber = 1)
         {
             ViewData["PageIndex"] = pageNumber.ToString();
-            PaginatedList<DogeImage> pages;
-            if (sortOrder == "true")
-            { //https://www.reddit.com/r/dotnet/comments/cl8s26/im_really_bad_at_linq/
-                
-                ViewData["CurrentSort"] = "true";
-                var dogesThumbnails =
-                                        
-                                        from img in _context.Images
-                                        join post in _context.Posts
-                                        on img.Post equals post
-                                        where post.IsApproved == false
+            PaginatedList<DogeSmallImage> pages;
+            if (sortOrder == "UnApprovedOnly")
+            {
+                ViewData["CurrentSort"] = "UnApprovedOnly";
+                var dogesThumbnails = _context.SmallImages.
+                    Include(im => im.Post).
+                    ThenInclude(post => post.Users).Where(p => p.Post.IsApproved == false).AsQueryable();
 
-                                        let tempPost = new DogePost
-                                        {
-                                            DogeImage = img,
-                                            UpVotes = post.UpVotes,
-                                            IsApproved = post.IsApproved,
-                                            Users = _context.UserPost.Where(up => up.DogePost == post).ToList()
-                                        }
-                                        select new DogeImage()
-                                        {
-                                            Id = img.Id,
-                                            Pictogram = img.Pictogram,
-                                            Post = tempPost
-                                        };
-
-                pages = await PaginatedList<DogeImage>.CreateAsync(dogesThumbnails, pageNumber, totalPostOnPage);
+                pages = await PaginatedList<DogeSmallImage>.CreateAsync(dogesThumbnails, pageNumber, totalPostOnPage);
 
             }
+
             else
             {
                 ViewData["CurrentSort"] = "";
-                var dogesThumbnails =
+                var dogesThumbnails = _context.SmallImages.
+                    Include(im => im.Post).
+                    ThenInclude(post => post.Users).AsQueryable();
 
-                                       from img in _context.Images
-                                       join post in _context.Posts
-                                       on img.Post equals post
+                pages = await PaginatedList<DogeSmallImage>.CreateAsync(dogesThumbnails, pageNumber, totalPostOnPage);
 
-                                       let tempPost = new DogePost
-                                       {
-                                           DogeImage = img,
-                                           UpVotes = post.UpVotes,
-                                           IsApproved = post.IsApproved,
-                                           Users = _context.UserPost.Where(up => up.DogePost == post).ToList()
-                                       }
-                                       select new DogeImage()
-                                       {
-                                           Id = img.Id,
-                                           Pictogram = img.Pictogram,
-                                           Post = tempPost
-                                       };
-
-                //var db2 = _context.Images.Select(p => new DogeImage { Id = p.Id, Pictogram = p.Pictogram }).Include(im => im.Post);
-
-
-                pages = await PaginatedList<DogeImage>.CreateAsync(dogesThumbnails, pageNumber, totalPostOnPage);
             }
 
             return View(pages);
@@ -99,7 +64,7 @@ namespace Doge.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var dogeImage = await _context.Images
+            var dogeImage = await _context.BigImages.Include(im => im.DogeSmallImage)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (dogeImage == null)
             {
@@ -111,13 +76,14 @@ namespace Doge.Areas.Admin.Controllers
 
         public async Task<IActionResult> Approve(int? id)
         {
-            //id is Image id
-            var post = (from p in _context.Posts
-                        where p.Id ==
-                           (from im in _context.Images where im.Id == id select im).FirstOrDefault().Id
-                        select p).FirstOrDefault();
+            //id is Image id          
 
-            post.IsApproved = true;
+            var p3 = (from im in _context.BigImages
+                     where im.Id == id
+                     join p in _context.Posts on im.Id equals p.DogeImage.Id
+                     select p).FirstOrDefault();
+
+            p3.IsApproved = true;
             await _context.SaveChangesAsync();
 
             //redirect to same page with only favorite posts displayed
@@ -131,15 +97,15 @@ namespace Doge.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index), new { sortOrder = sort, pageNumber = index });
         }
 
-            // GET: Admin/DogeImages/Delete/5
-            public async Task<IActionResult> Delete(int? id)
+        // GET: Admin/DogeImages/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var dogeImage = await _context.Images
+            var dogeImage = await _context.BigImages.Include(im => im.DogeSmallImage)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (dogeImage == null)
             {
@@ -154,9 +120,9 @@ namespace Doge.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var dogeImage = await _context.Images.FindAsync(id);
-            
-            _context.Images.Remove(dogeImage);
+            var dogeImage = await _context.SmallImages.FindAsync(id);
+
+            _context.SmallImages.Remove(dogeImage);
             await _context.SaveChangesAsync();
 
             var dogePost = _context.Posts.Any(p => p.DogeImage == dogeImage);
@@ -166,18 +132,19 @@ namespace Doge.Areas.Admin.Controllers
             int index = 1;
             if (ViewData.ContainsKey("CurrentSort"))
                 sort = ViewData["CurrentSort"].ToString();
-            if(ViewData.ContainsKey("PageIndex"))
+            if (ViewData.ContainsKey("PageIndex"))
                 index = int.Parse(ViewData["PageIndex"].ToString());
 
             return RedirectToAction(nameof(Index), new { sortOrder = sort, pageNumber = index });
         }
 
+        #region ------------------------------------logs
         public IActionResult IndexLogs()
         {
             var logPath = _env.WebRootPath + "\\logs";
             var logs = Directory.GetFiles(logPath).ToList();
-           
-            
+
+
             return View(logs);
         }
 
@@ -187,12 +154,12 @@ namespace Doge.Areas.Admin.Controllers
             using (var clef = System.IO.File.OpenText(logName))
             {
                 var reader = new LogEventReader(clef);
-                LogEvent evt;
-                while (reader.TryRead(out evt))
+                while (reader.TryRead(out LogEvent evt))
                     logEntries.Add(evt.Convert());
+                reader.Dispose();
             }
 
-               
+
             return View(logEntries);
         }
 
@@ -201,6 +168,7 @@ namespace Doge.Areas.Admin.Controllers
             System.IO.File.Delete(logName);
             return RedirectToAction(nameof(IndexLogs));
         }
+        #endregion
     }
 
     public class LogEntry
@@ -211,5 +179,5 @@ namespace Doge.Areas.Admin.Controllers
         public string @mt { get; set; }
         public string SourceContext { get; set; }
     }
-  
+
 }
