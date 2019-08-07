@@ -4,7 +4,7 @@
     <div class="card border-info">
         <input hidden id="postId" value="@Model.Post.Id" />
         <div>
-            <img class="card-img-top img-fluid" 
+            @*<img class="card-img-top img-fluid" 
 
                @{ string imgsrc = "";
                  if (Model.Post.DogeImage.DogeBigImage.Image!= null)
@@ -15,7 +15,10 @@
                       { imgsrc = Model.Post.DogeImage.URL; }
                  }
            
-                 src="@imgsrc">
+                 src="@imgsrc">*@
+
+            <img class="card-img-top img-fluid" Image="@Model.Post.DogeImage" />
+           
         </div>
         <div class="card-body">
             @{

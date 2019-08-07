@@ -4,16 +4,17 @@
 <div class="card border-info">
     <input hidden id="postId" value="@Model.Post.Id" />
     <div>
-        <img class="card-img-top img-fluid"
-             @{ string imgsrc = "";
-                 if (Model.Post.DogeImage.DogeBigImage.Image!= null)
-            
-                  { var b64 = Convert.ToBase64String(Model.Post.DogeImage.DogeBigImage.Image);
-                     imgsrc = string.Format("data:image/jpg;base64,{0}", b64); } 
-                 else
-                      { imgsrc = Model.Post.DogeImage.URL; }
-                 }
-             src="@imgsrc">
+        @*<img class="card-img-top img-fluid"
+        @{ string imgsrc = "";
+            if (Model.Post.DogeImage.DogeBigImage.Image!= null)
+
+             { var b64 = Convert.ToBase64String(Model.Post.DogeImage.DogeBigImage.Image);
+                imgsrc = string.Format("data:image/jpg;base64,{0}", b64); }
+            else
+                 { imgsrc = Model.Post.DogeImage.URL; }
+            }
+        src="@imgsrc">*@
+        <img class="card-img-top img-fluid" Image="@Model.Post.DogeImage" />
     </div>
     <div class="card-body">
         @{        

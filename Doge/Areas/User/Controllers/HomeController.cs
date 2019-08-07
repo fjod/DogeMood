@@ -55,7 +55,7 @@ namespace Doge.Areas.User.Controllers
                 ThenInclude(im => im.DogeBigImage).
                 Where(p => p.Users.Any(post => post.DogeUser == dbUser)).AsQueryable();
             
-            var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
+            var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPost, pageNumber, totalPostOnPage);
                        
             List<DogePostForUser> lt = new List<DogePostForUser>();
 
