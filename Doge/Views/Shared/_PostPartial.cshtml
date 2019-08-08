@@ -7,12 +7,15 @@
             <img class="card-img-top img-fluid" 
 
                @{ string imgsrc = "";
-                 if (Model.Post.DogeImage.DogeBigImage.Image!= null)
-            
-                  { var b64 = Convert.ToBase64String(Model.Post.DogeImage.DogeBigImage.Image);
-                     imgsrc = string.Format("data:image/jpg;base64,{0}", b64); } 
-                 else
-                      { imgsrc = Model.Post.DogeImage.URL; }
+                     if (Model.Post.DogeImage.DogeBigImage != null)
+                     {
+                         
+                             var b64 = Convert.ToBase64String(Model.Post.DogeImage.DogeBigImage.Image);
+                             imgsrc = string.Format("data:image/jpg;base64,{0}", b64);
+                         
+                     }
+                     else
+                     { imgsrc = Model.Post.DogeImage.URL; }
                  }
            
                  src="@imgsrc">

@@ -54,7 +54,16 @@ namespace Doge.Areas.User.Controllers
                 Include(p => p.DogeImage).
                 ThenInclude(im => im.DogeBigImage).
                 Where(p => p.Users.Any(post => post.DogeUser == dbUser)).AsQueryable();
-            
+
+            if (pageNumber > favPosts.Count() / totalPostOnPage + 1)
+            {
+                pageNumber = favPosts.Count() / totalPostOnPage + 1;
+            }
+            if (pageNumber <= 0)
+            {
+                pageNumber = 1;
+            }
+
             var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
                        
             List<DogePostForUser> lt = new List<DogePostForUser>();
@@ -87,14 +96,14 @@ namespace Doge.Areas.User.Controllers
             var file = HttpContext.Request.Form.Files;
 
             if (!_doge.DogeURL.IsNullOrEmpty() &&
-                !file.First().FileName.IsNullOrEmpty())
+                file.Any())
             {
                 Alert("Either upload file or paste URL!", NotificationType.error);
                 return RedirectToAction("UploadNewDoge");
             }
 
             if (_doge.DogeURL.IsNullOrEmpty() &&
-             file.First().FileName.IsNullOrEmpty())
+             !file.Any())
             {
                 Alert("Either upload  file or paste URL!", NotificationType.error);
                 return RedirectToAction("UploadNewDoge");
@@ -105,41 +114,41 @@ namespace Doge.Areas.User.Controllers
             byte[] Thumbnail = null;
             byte[] _Image = null;
             Bitmap b1 = null;
-            if (!file.First().FileName.IsNullOrEmpty())
-            {
-                var filePath = Path.GetTempFileName();
+            string webRootPath = _env.WebRootPath;
+            var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");
 
+            if (file.Any())
+            {
+               // var filePath = Path.GetTempFileName();
+               
 
                 if (file.First().Length > 0)
                 {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    using (var stream = new FileStream(imagePath, FileMode.Create))
                     {
                         await file.First().CopyToAsync(stream);
                     }
-                }
-
-
-                b1 = new Bitmap(filePath);
-                Thumbnail = b1.ToThumbnail();
-                _Image = b1.ToByteArray(ImageFormat.Jpeg);
-                b1.Dispose();
-                System.IO.File.Delete(filePath);
+                }             
+                
             }
             else
             {
-                string webRootPath = _env.WebRootPath;
-                var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");
+                //string webRootPath = _env.WebRootPath;
+                //var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");
 
                 using (var client = new WebClient())
                 {
                     client.DownloadFile(_doge.DogeURL, imagePath);
-                }
+                }               
 
-                b1 = new Bitmap(imagePath);
-                Thumbnail = b1.ToThumbnail();
-                _Image = b1.ToByteArray(ImageFormat.Jpeg);
-                b1.Dispose();
             }
+            b1 = new Bitmap(imagePath);
+            Thumbnail = b1.ToThumbnail();
+            _Image = b1.ToByteArray(ImageFormat.Jpeg);
+            b1.Dispose();
+
+            System.IO.File.Delete(imagePath);
+
 
             //as user uploads image, I need to create a post for it
             //to do pre-moderation                     
@@ -214,7 +223,14 @@ namespace Doge.Areas.User.Controllers
                             OrderBy(p => p.UpVotes);
             }
 
-          
+            if (pageNumber > favPosts.Count()/totalPostOnPage+1)
+            {
+                pageNumber = favPosts.Count() / totalPostOnPage + 1;
+            }
+            if (pageNumber <=0)
+            {
+                pageNumber = 1;
+            }
             var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
 
             
@@ -315,7 +331,7 @@ namespace Doge.Areas.User.Controllers
             {
                 var userPost = post.Users.First(up => up.DogePost == post);
                 post.Users.Remove(userPost);
-                post.DogeImage.DogeBigImage = null; //remove image from DB
+                post.DogeImage.DogeBigImage.Image = null; //remove image from DB
                 await Db.SaveChangesAsync();
                 return "true";
             }
