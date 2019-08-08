@@ -203,35 +203,35 @@ namespace Doge.Areas.User.Controllers
         public async Task<IActionResult> Index(string sortOrder, int pageNumber = 1)
         {        
 
-            IQueryable < DogePost > favPosts = null;
+            IQueryable < DogePost > indexPosts = null;
             TempData["CurrentSort"] = sortOrder;
             
             
             if (sortOrder == "byNew" || sortOrder == null)
             {                
-                favPosts = Db.Posts.Where(p => p.IsApproved).
-                          Include(post => post.DogeImage).
+                indexPosts = Db.Posts.Where(p => p.IsApproved).
+                          Include(post => post.DogeImage).ThenInclude(im => im.DogeBigImage).
                           Include(u => u.Users).
-                          OrderBy(p => p.AddDate);
+                          OrderByDescending(p => p.AddDate);
             }
 
             if (sortOrder == "byTop")
             {
-                favPosts = Db.Posts.Where(p=>p.IsApproved).
-                            Include(post=>post.DogeImage).
+                indexPosts = Db.Posts.Where(p=>p.IsApproved).
+                            Include(post=>post.DogeImage).ThenInclude(im => im.DogeBigImage).
                             Include(u => u.Users).
                             OrderBy(p => p.UpVotes);
             }
 
-            if (pageNumber > favPosts.Count()/totalPostOnPage+1)
+            if (pageNumber > indexPosts.Count()/totalPostOnPage+1)
             {
-                pageNumber = favPosts.Count() / totalPostOnPage + 1;
+                pageNumber = indexPosts.Count() / totalPostOnPage + 1;
             }
             if (pageNumber <=0)
             {
                 pageNumber = 1;
             }
-            var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPosts, pageNumber, totalPostOnPage);
+            var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(indexPosts, pageNumber, totalPostOnPage);
 
             
             List<DogePostForUser> lt = new List<DogePostForUser>();
@@ -252,8 +252,7 @@ namespace Doge.Areas.User.Controllers
                 {
                     postWasLiked = bool.Parse(TempData.Peek("post" + item.Id.ToString()).ToString());
                 }
-
-               // item.DogeImage = await Db.SmallImages.FirstOrDefaultAsync(im => im.Post == item);
+               
                 lt.Add(new DogePostForUser
                 {
                     Post = item,

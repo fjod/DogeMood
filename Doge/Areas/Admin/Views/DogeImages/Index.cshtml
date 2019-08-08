@@ -36,6 +36,9 @@
                 IsApproved
             </th>
             <th>
+                AddTime
+            </th>
+            <th>
                 Likes
             </th>
             <th>
@@ -60,6 +63,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Post.IsApproved)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Post.AddDate)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Post.UpVotes)

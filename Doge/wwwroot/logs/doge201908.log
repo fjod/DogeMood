@@ -9,3 +9,4 @@
 {"@t":"2019-08-07T10:22:19.3626878Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
 {"@t":"2019-08-07T10:23:00.0655141Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
 {"@t":"2019-08-07T10:24:31.3725201Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-08-08T10:29:10.2498510Z","@mt":"created new account for testuserwith email test@gg.com","SourceContext":"Doge.Areas.Identity.Pages.Account.RegisterModel"}

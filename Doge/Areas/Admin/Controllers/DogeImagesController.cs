@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using System.ComponentModel.DataAnnotations;
 using Serilog.Formatting.Compact.Reader;
 using Serilog.Events;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Doge.Areas.Admin.Controllers
 {
@@ -27,6 +28,7 @@ namespace Doge.Areas.Admin.Controllers
         }
         public int totalPostOnPage = 10;
         // GET: Admin/DogeImages
+        [Authorize]
         public async Task<IActionResult> Index(string sortOrder = "", int pageNumber = 1)
         {
             ViewData["PageIndex"] = pageNumber.ToString();
@@ -57,6 +59,7 @@ namespace Doge.Areas.Admin.Controllers
         }
 
         // GET: Admin/DogeImages/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -73,7 +76,7 @@ namespace Doge.Areas.Admin.Controllers
 
             return View(dogeImage);
         }
-
+        [Authorize]
         public async Task<IActionResult> Approve(int? id)
         {
             //id is Image id          
@@ -98,6 +101,7 @@ namespace Doge.Areas.Admin.Controllers
         }
 
         // GET: Admin/DogeImages/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -118,15 +122,16 @@ namespace Doge.Areas.Admin.Controllers
         // POST: Admin/DogeImages/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var dogeImage = await _context.SmallImages.FindAsync(id);
+            var bdogeImage = await _context.SmallImages.FindAsync(id);
+            _context.SmallImages.Remove(bdogeImage);
+            var  sdogeImage = await _context.BigImages.FindAsync(id);
+            _context.BigImages.Remove(sdogeImage);            
+          
+            await _context.SaveChangesAsync();           
 
-            _context.SmallImages.Remove(dogeImage);
-            await _context.SaveChangesAsync();
-
-            var dogePost = _context.Posts.Any(p => p.DogeImage == dogeImage);
-            Console.WriteLine(dogePost);
 
             string sort = "";
             int index = 1;
@@ -139,6 +144,7 @@ namespace Doge.Areas.Admin.Controllers
         }
 
         #region ------------------------------------logs
+        [Authorize]
         public IActionResult IndexLogs()
         {
             var logPath = _env.WebRootPath + "\\logs";
@@ -147,7 +153,7 @@ namespace Doge.Areas.Admin.Controllers
 
             return View(logs);
         }
-
+        [Authorize]
         public IActionResult BrowseLog(string logName)
         {
             List<LogEntry> logEntries = new List<LogEntry>();
@@ -162,7 +168,7 @@ namespace Doge.Areas.Admin.Controllers
 
             return View(logEntries);
         }
-
+        [Authorize]
         public IActionResult DeleteLog(string logName)
         {
             System.IO.File.Delete(logName);

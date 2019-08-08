@@ -20,16 +20,17 @@ namespace  IntegrationTests
     {
         private readonly WebApplicationFactory<Doge.Startup> _factory;
 
-
-        public IntegrationTests(WebApplicationFactory<Doge.Startup> factory)
+        ITestOutputHelper _output;
+        public IntegrationTests(WebApplicationFactory<Doge.Startup> factory, ITestOutputHelper output)
 
         {
             _factory = factory;
+            _output = output;
         }
 
         [Theory]
         [InlineData("/")]
-        [InlineData("/Home/Index")]
+        [InlineData("/?pageNumber=2")]
         public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange
@@ -55,11 +56,10 @@ namespace  IntegrationTests
                 });
 
             // Act
-            var response = await client.GetAsync("/UploadNewDoge");
-
-            // Assert
-            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-            Assert.StartsWith("http://localhost/Identity/Account/Login",
+            var response = await client.GetAsync("/Admin/DogeImages/IndexLogs");
+          
+            // Assert            
+            Assert.Contains("Identity/Account/Login",
                 response.Headers.Location.OriginalString);
         }
     }
@@ -83,7 +83,7 @@ namespace  IntegrationTests
             var client = _factory.CreateClient();
 
             // The endpoint or route of the controller action.
-            var httpResponse = await client.GetAsync("/Index");
+            var httpResponse = await client.GetAsync("/");
 
             // Must be successful.
             httpResponse.EnsureSuccessStatusCode();
