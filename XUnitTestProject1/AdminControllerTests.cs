@@ -15,10 +15,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using Tests;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Tests
+namespace XUnitTestProject
 {
 
     public class AdminControllerTests : TestBase
@@ -37,9 +38,9 @@ namespace Tests
         }
 
         [Fact]
-        public void IndexNoPagination()
+        public async void IndexNoPagination()
         {
-            var ret = sut.Index();
+            var ret = await sut.Index();
 
             var viewResult = Assert.IsType<ViewResult>(ret);
             var model = Assert.IsAssignableFrom<IEnumerable<DogeSmallImage>>(
@@ -51,14 +52,14 @@ namespace Tests
             var sortedByNewFromDb = _dbContext.SmallImages.Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
-                Assert.True(dogeList[i] == sortedByNewFromDb[i]);
+                Assert.True(dogeList[i].Id == sortedByNewFromDb[i].Id);
             }
         }
 
         [Fact]
-        public void IndexWithPagination()
+        public async void IndexWithPagination()
         {
-            var ret = sut.Index("",2);
+            var ret = await sut.Index("",2);
 
             var viewResult = Assert.IsType<ViewResult>(ret);
             var model = Assert.IsAssignableFrom<IEnumerable<DogeSmallImage>>(
@@ -71,14 +72,14 @@ namespace Tests
                 Skip(sut.totalPostOnPage).Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
-                Assert.True(dogeList[i] == sortedByNewFromDb[i]);
+                Assert.True(dogeList[i].Id == sortedByNewFromDb[i].Id);
             }
         }
 
         [Fact]
-        public void IndexNoPaginationUnApproved()
+        public async void IndexNoPaginationUnApproved()
         {
-            var ret = sut.Index("UnApprovedOnly");
+            var ret = await sut.Index("UnApprovedOnly");
 
             var viewResult = Assert.IsType<ViewResult>(ret);
             var model = Assert.IsAssignableFrom<IEnumerable<DogeSmallImage>>(
@@ -90,61 +91,74 @@ namespace Tests
 
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
-                Assert.True(dogeList[i] == sortedByNewFromDb[i]);
+                Assert.True(dogeList[i].Id == sortedByNewFromDb[i].Id);
             }
         }
 
         [Fact]
-        public void CanGetDetails()
+        public async void CanGetDetails()
         {
-            var randInt = new Random().Next(base.TotalPostsInDb);
-
-            var BigImgFromDb = _dbContext.BigImages
-                .FirstOrDefault(m => m.Id == randInt);
-
-            var ret = sut.Details(randInt);
+           
+            var BigImgFromDb = _dbContext.BigImages.FirstOrDefault();
+        
+            var ret = await sut.Details(BigImgFromDb.Id);
             var viewResult = Assert.IsType<ViewResult>(ret);
             var model = Assert.IsAssignableFrom<DogeBigImage>(
                 viewResult.ViewData.Model);
 
             Assert.True(BigImgFromDb == model);
+
+            //now with bad request
+            ret = await sut.Details(int.MaxValue);
+            Assert.IsType<NotFoundResult>(ret);
+
+            ret = await sut.Details(null);
+            Assert.IsType<NotFoundResult>(ret);
         }
 
         [Fact]
-        public void CanApprove()
+        public async void CanApprove()
         {
             var firstUnapprovedPost = _dbContext.Posts.
                 Include(p=>p.DogeImage).
                 ThenInclude(im=>im.DogeBigImage).
                 FirstOrDefault(p => !p.IsApproved);
             //image for it
-            var ret = sut.Approve(firstUnapprovedPost.DogeImage.Id);
+            var ret = await sut.Approve(firstUnapprovedPost.DogeImage.Id);
 
-            //checking if ret is correct is a part of integration tests
-            //now to check only if the post is approved
+           
             Assert.True(firstUnapprovedPost.IsApproved);
+            Assert.IsType<RedirectToActionResult>(ret);
+            Assert.Equal("Index", ((RedirectToActionResult)ret).ActionName);
         }
 
         [Fact]
-        public void GetCorrectImageToDelete()
+        public async void GetCorrectImageToDelete()
         {
-            var randInt = new Random().Next(base.TotalPostsInDb);
+            
 
-            var image = _dbContext.BigImages.FirstOrDefault(im => im.Id == randInt);
+            var image = _dbContext.BigImages.FirstOrDefault();
 
-            var ret = sut.Delete(randInt);
+            var ret = await sut.Delete(image.Id);
 
             var viewResult = Assert.IsType<ViewResult>(ret);
             var model = Assert.IsAssignableFrom<DogeBigImage>(
                 viewResult.ViewData.Model);
 
             Assert.True(image == model);
+
+            //now with bad request
+            ret = await sut.Delete(int.MaxValue);
+            Assert.IsType<NotFoundResult>(ret);
+
+            ret = await sut.Delete(null);
+            Assert.IsType<NotFoundResult>(ret);
         }
 
         [Fact]
         public void ConfirmedDelete()
         {
-            var randInt = new Random().Next(base.TotalPostsInDb);
+            var randInt = new Random().Next(TotalPostsInDb);
 
             var image = _dbContext.BigImages.FirstOrDefault(im => im.Id == randInt);
 
@@ -193,7 +207,7 @@ namespace Tests
 
             for (int i = 0; i < logEntries.Count; i++)
             {
-                Assert.Equal(logEntries[i],model[i]);
+                Assert.Equal(logEntries[i].ToString(),model[i].ToString());
             }
         }
 

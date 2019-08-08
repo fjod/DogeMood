@@ -40,7 +40,7 @@ namespace Doge.Utils
 
         private void DoWork(object state)
         {
-            
+           
             Log.ForContext<TimedHostedService>().Information("Downloading pics from Reddit..");
             using (var scope = scopeFactory.CreateScope())
             {
@@ -65,8 +65,13 @@ namespace Doge.Utils
 
                 //https://v.redd.it/tc8a5z4xp4d31
                 pics.RemoveAll(p => p.ImageUrl.Contains("v.redd.it", StringComparison.Ordinal)); //delet all videos
-                pics.RemoveAll(p => !p.ImageUrl.EndsWith(".jpg", StringComparison.Ordinal));
-                pics.RemoveAll(p => !p.ImageUrl.EndsWith(".png", StringComparison.Ordinal));
+                pics.RemoveAll(p =>
+                !(
+                  p.ImageUrl.EndsWith(".jpg", StringComparison.Ordinal)
+                  ||
+                  !p.ImageUrl.EndsWith(".png", StringComparison.Ordinal)
+                ));
+                
                 pics.ForEach(pic =>
                 {
                     string webRootPath = _env.WebRootPath;

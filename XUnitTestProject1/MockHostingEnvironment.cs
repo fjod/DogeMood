@@ -24,7 +24,7 @@ namespace Tests
             {
 
                 var startupFolder = Environment.CurrentDirectory.Replace("XUnitTestProject1\\bin\\Debug\\netcoreapp2.2", "");
-                return startupFolder + "Doge\\wwwroot";
+                return startupFolder + "Doge\\wwwroot\\";
             }
             set
             {

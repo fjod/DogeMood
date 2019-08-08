@@ -26,6 +26,7 @@ namespace Doge.Utils
         public static byte[] ToThumbnail(this Bitmap image)
         {
             float ratio = image.Width / image.Height;
+            if (ratio == 0) ratio = 1;
             SizeF newSize = new SizeF(200, 200 * ratio);
             Bitmap target = new Bitmap((int)newSize.Width, (int)newSize.Height);
 

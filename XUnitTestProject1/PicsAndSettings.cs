@@ -57,14 +57,14 @@ namespace XUnitTestProject
         {
             var sut = new TimedHostedService(new RedditPics(Configuration), ScopeFactory);
 
-            Assert.True(_dbContext.SmallImages.Count() == 0);
-            Assert.True(_dbContext.Posts.Count() == 0);
+           var prevImages = _dbContext.SmallImages.Count();
+            var prevPosts = _dbContext.Posts.Count();
             await sut.StartAsync(CancellationToken.None);
                        
 
             await Task.Delay(5000);
-            Assert.False(_dbContext.SmallImages.Count() == 0);
-            Assert.False(_dbContext.Posts.Count() == 0);
+            Assert.False(_dbContext.SmallImages.Count() == prevImages);
+            Assert.False(_dbContext.Posts.Count() == prevPosts);
 
             await sut.StopAsync(CancellationToken.None);
         }

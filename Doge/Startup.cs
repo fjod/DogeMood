@@ -112,7 +112,7 @@ namespace Doge
             app.UseCookiePolicy();
             app.UseSession();
             app.UseAuthentication();
-            app.ConfigureExceptionHandler();
+           // app.ConfigureExceptionHandler();
 
             app.UseMvc(routes =>
             {
