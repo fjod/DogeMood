@@ -253,7 +253,7 @@ namespace Doge.Areas.User.Controllers
         #region likes
         readonly string userKey = "CurrentAnonUser";    
 
-        public async Task<string> LikePost2(int postId)
+        public async Task<string> LikePost(int postId)
         {
             //anonymous user can like post, so need to keep likes from abuse
             using (var scope = scopeFactory.CreateScope())

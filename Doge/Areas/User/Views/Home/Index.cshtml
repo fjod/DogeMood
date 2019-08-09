@@ -113,7 +113,7 @@
 
     function LikeClick(id, name) {
 
-         var url = '@Url.Content("~/")' + "User/Home/LikePost2";
+         var url = '@Url.Content("~/")' + "User/Home/LikePost";
         $.get(url,  { postId: id } , function (ret) {
             if (ret == "false") {                
                 name.classList.remove("active");
