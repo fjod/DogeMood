@@ -3,43 +3,26 @@
 
     <div class="card border-info">
         <input hidden id="postId" value="@Model.Post.Id" />
-        <div>
-            @*<img class="card-img-top img-fluid" 
-
-               @{ string imgsrc = "";
-                     if (Model.Post.DogeImage.DogeBigImage != null)
-                     {
-                         
-                             var b64 = Convert.ToBase64String(Model.Post.DogeImage.DogeBigImage.Image);
-                             imgsrc = string.Format("data:image/jpg;base64,{0}", b64);
-                         
-                     }
-                     else
-                     { imgsrc = Model.Post.DogeImage.URL; }
-                 }
-           
-                 src="@imgsrc">*@
+        <div>           
 
             <img class="card-img-top img-fluid" Image="@Model.Post.DogeImage" />
            
         </div>
         <div class="card-body">
-            @{
-                bool like = Model.WasLiked;
-                string _like = like.ToString().ToLower();
+            @{                
+                string _like = Model.WasLiked.ToString().ToLower();
                 string _likeActive = "";
                 string likeText = "Like";
-                if (like)
+                if (Model.WasLiked)
                 {
                     likeText = "Unlike";
                     _likeActive = "active";
                 }
-
-                bool fav = Model.WasFavorited;
-                string _fav = fav.ToString().ToLower();
+                
+                string _fav = Model.WasFavorited.ToString().ToLower();
                 string favText = "Favorite";
                 string _favActive = "";
-                if (fav)
+                if (Model.WasFavorited)
                 {
                     favText = "Unfavorite";
                     _favActive = "active";
@@ -49,22 +32,35 @@
                  string _fb = "favButton" + Model.Post.Id.ToString();
             }
             <div class="text-center">
-                
+
                 <a id="@_lb" class="btn btn-primary @_likeActive"
-                        aria-pressed="@_like"                        
-                        >
+                   aria-pressed="@_like">
                     @likeText
                 </a>
 
-                <a  id="@_fb"  class="btn btn-primary @_favActive"
-                         aria-pressed="@_fav"                     
-                        >
+                <a id="@_fb" class="btn btn-primary @_favActive"
+                   aria-pressed="@_fav">
                     @favText
                 </a>
 
-                <button type="button" class="btn btn-info">
-                    Share
-                </button>
+                @{
+                   string hr = "http://vk.com/share.php?url=";
+                               hr += Model.Post.DogeImage.URL;
+                               hr += "&title=DOGE&description=SuperShibe&image=";
+                               hr += Model.Post.DogeImage.URL; 
+
+                    if (@Model.Post.DogeImage.URL != null)
+                    {
+                        <a class="btn btn-default"
+                           target="_blank" 
+                           title="On VK.com"                           
+                           href="@hr">
+                            Share on <i class="fab fa-vk fa-lg"></i>
+                        </a>
+                    }
+                }
+
+
 
             </div>
         </div>

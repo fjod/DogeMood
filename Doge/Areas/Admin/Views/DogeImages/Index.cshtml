@@ -57,8 +57,13 @@
                 @Html.DisplayFor(modelItem => item.Id)
             </td>
             <td>
-                <img @{ var b64 = Convert.ToBase64String(item.Pictogram); var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); }
-                     src="@imgsrc">
+                
+                @{
+                    var b64 = Convert.ToBase64String(item.Pictogram);
+                    var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); 
+                }
+                <img src="@imgsrc" />
+                     
 
             </td>
             <td>

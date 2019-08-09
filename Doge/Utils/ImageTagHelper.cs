@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,25 +13,28 @@ namespace Doge
     [HtmlTargetElement("img")]
     public class ImageTagHelper : TagHelper
     {
+        readonly IHostingEnvironment _env;
+        public ImageTagHelper(IHostingEnvironment env) : base()
+        {
+            _env = env;
+        }
         private bool RemoteFileExists(string url)
         {
             try
             {
-                //Creating the HttpWebRequest
+
                 HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
-                //Setting the Request method HEAD, you can also use GET too.
                 request.Method = "HEAD";
-                //Getting the Web Response.
                 HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-                //Returns TRUE if the Status code == 200
-               
+
                 bool ret = response.StatusCode == HttpStatusCode.OK;
+
                 response.Close();
+
                 return (ret);
             }
             catch
             {
-                //Any exception will returns false.
                 return false;
             }
         }
@@ -39,40 +44,55 @@ namespace Doge
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             string imgsrc = "";
-           
+
             void usedDbImageIfPossible()
             {
-                if (Image.DogeBigImage != null)
+                if (Image.DogeBigImage?.Image != null)
                 {
-                    if (Image.DogeBigImage.Image != null)
-                    {
-                        var b64 = Convert.ToBase64String(Image.DogeBigImage.Image);
-                        imgsrc = string.Format("data:image/jpg;base64,{0}", b64);
-                    }
+                    var b64 = Convert.ToBase64String(Image.DogeBigImage.Image);
+                    imgsrc = string.Format("data:image/jpg;base64,{0}", b64);
                 }
             }
 
-            if (Image.URL == null)
+            try
             {
-                usedDbImageIfPossible();
-            }
-            else
-            if (Image.URL.Length > 0)
-            {
-                //there is some link, is it dead?
-                var goodUrl = RemoteFileExists(Image.URL);
-                if (goodUrl)
-                {
-                    imgsrc = Image.URL;
-                }
-                else
+
+                if (Image.URL == null)//no url, so use db
                 {
                     usedDbImageIfPossible();
                 }
-            }   
+                else
+                if (Image.URL.Length > 0)
+                {
+                    //there is some link, is it dead?
+                    var goodUrl = RemoteFileExists(Image.URL);
+                    if (goodUrl)
+                    {
+                        imgsrc = Image.URL;
+                    }
+                    else
+                    {
+                        usedDbImageIfPossible();
+                    }
+                }
+            }
+            catch 
+            {
+
+            }
+            finally
+            {
+                if (imgsrc == "")
+                {
+                    //no image after all work, so provide sample
+
+                    string webRootPath = _env.WebRootPath;
+                    var imagePath = Path.Combine(webRootPath, "images\\sampleImage.jpg");
+                    imgsrc = imagePath;
+                }  
+            }
 
             output.Attributes.SetAttribute("src", imgsrc);
-              
         }
     }
 }

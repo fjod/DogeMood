@@ -66,13 +66,12 @@
 
     window.addEventListener("load", function() {
          @{           
-                 //might be less than 4 posts
+                 //might be less than 4 posts on page, so let's create all 4 ids for buttons
                  List<string> resultFavButtons = new List<string> { "","","","" };         
 
                  List<string> resultLikeButtons = new List<string>{ "","","","" };                
 
-                 List<int> resultIds = new List<int>{ 0,0,0,0 };
-                
+                 List<int> resultIds = new List<int>{ 0,0,0,0 };                
 
 
                  for (int i = 0; i < Model.Posts.Count; i++)
@@ -80,20 +79,24 @@
                      resultFavButtons[i] = (favButtons[i]);
                      resultLikeButtons[i] = (likeButtons[i]);
                      resultIds[i] = (ids[i]);
-
-
                  }
              }
 
-             document.getElementById('@resultFavButtons[0]').
+        //favorite buttons
+        document.getElementById('@resultFavButtons[0]').
             addEventListener('click', function () { FavClick(@resultIds[0],@resultFavButtons[0]); }, false);
+
         document.getElementById('@resultFavButtons[1]').
             addEventListener('click', function () { FavClick(@resultIds[1],@resultFavButtons[1]); }, false);
+
         document.getElementById('@resultFavButtons[2]').
             addEventListener('click', function () { FavClick(@resultIds[2],@resultFavButtons[2]); }, false);
+
         document.getElementById('@resultFavButtons[3]').
             addEventListener('click', function () { FavClick(@resultIds[3],@resultFavButtons[3]); }, false);
 
+
+        //likebuttons
         document.getElementById('@resultLikeButtons[0]').
             addEventListener('click', function () { LikeClick(@resultIds[0],@resultLikeButtons[0]); }, false);
         document.getElementById('@resultLikeButtons[1]').

@@ -17,9 +17,7 @@ namespace Doge.Utils
     public class TimedHostedService : IHostedService, IDisposable
     {
         private Timer _timer;
-
-
-        IGetPics pictures;       
+        readonly IGetPics pictures;       
         private readonly IServiceScopeFactory scopeFactory;      
 
         public TimedHostedService(IGetPics _pics, IServiceScopeFactory scopeFactory)
@@ -32,15 +30,13 @@ namespace Doge.Utils
         {
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromHours(24));
-              //  TimeSpan.FromSeconds(10));
+                TimeSpan.FromHours(24));              
 
             return Task.CompletedTask;
         }
 
         private void DoWork(object state)
-        {
-            return;
+        {           
             Log.ForContext<TimedHostedService>().Information("Downloading pics from Reddit..");
             using (var scope = scopeFactory.CreateScope())
             {

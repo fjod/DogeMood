@@ -13,23 +13,24 @@ namespace Doge.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            //Database.ExecuteSqlCommand(@"CREATE VIEW DogePictograms AS 
-            //                                SELECT c.Id AS Id, c.Pictogram AS Pictogram
-            //                                FROM DogeImages c");
-        }
+
+        }   
+        
+        // public DbSet<DogeImage> Images { get; set; } //for migration
 
         public DbSet<DogePost> Posts { get; set; }
         public DbSet<DogeUser> DogeUsers { get; set; }
-       // public DbSet<DogeImage> Images { get; set; }
+
+    
 
         public DbSet<DogeBigImage> BigImages { get; set; }
         public DbSet<DogeSmallImage> SmallImages { get; set; }
-        // public DbQuery<Doge.Areas.Admin.Models.DogePictogram> DogePictograms { get; set; }
+        public DbSet<UserPost> UserPost { get; set; }
+        public DbSet<LogEntry> LogEntry { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-           
-
+        {           
+            //many-to-many configuration
             modelBuilder.Entity<UserPost>()
                .HasKey(_userPost => new { _userPost.UserId, _userPost.PostId });
 
@@ -43,11 +44,7 @@ namespace Doge.Data
                 .WithMany(c => c.FavoritePosts)
                 .HasForeignKey(_userPost => _userPost.UserId);
 
-            //modelBuilder.Entity<DogeImage>()
-            //        .HasOne(a => a.DogePost)
-            //        .WithOne(b => b.DogeImage)
-            //        .HasForeignKey<DogePost>(b => b.DogePostRef);
-
+            //table splitting configuration
             modelBuilder.Entity<DogeBigImage>().
                 HasOne(p => p.DogeSmallImage).
                 WithOne(p => p.DogeBigImage).
@@ -62,8 +59,5 @@ namespace Doge.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<Doge.Models.UserPost> UserPost { get; set; }
-
-        public DbSet<Doge.Areas.Admin.Controllers.LogEntry> LogEntry { get; set; }
     }
 }

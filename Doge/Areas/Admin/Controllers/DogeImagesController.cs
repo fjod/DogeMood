@@ -26,16 +26,20 @@ namespace Doge.Areas.Admin.Controllers
             _context = context;
             _env = env;
         }
-        public int totalPostOnPage = 10;
+        public readonly int totalPostOnPage = 10;
         // GET: Admin/DogeImages
         [Authorize]
         public async Task<IActionResult> Index(string sortOrder = "", int pageNumber = 1)
         {
             ViewData["PageIndex"] = pageNumber.ToString();
-            PaginatedList<DogeSmallImage> pages;
+            if (!ViewData.ContainsKey("CurrentSort"))
+                ViewData.Add("CurrentSort", sortOrder);
+            else
+            ViewData["CurrentSort"] = sortOrder;
+
+            PaginatedList <DogeSmallImage> pages;
             if (sortOrder == "UnApprovedOnly")
-            {
-                ViewData["CurrentSort"] = "UnApprovedOnly";
+            {           
                 var dogesThumbnails = _context.SmallImages.
                     Include(im => im.Post).
                     ThenInclude(post => post.Users).Where(p => p.Post.IsApproved == false).AsQueryable();
@@ -46,7 +50,7 @@ namespace Doge.Areas.Admin.Controllers
 
             else
             {
-                ViewData["CurrentSort"] = "";
+            
                 var dogesThumbnails = _context.SmallImages.
                     Include(im => im.Post).
                     ThenInclude(post => post.Users).AsQueryable();
@@ -89,15 +93,20 @@ namespace Doge.Areas.Admin.Controllers
             p3.IsApproved = true;
             await _context.SaveChangesAsync();
 
-            //redirect to same page with only favorite posts displayed
+            var retParams = GetCurrentViewDataParams();
+
+            return RedirectToAction(nameof(Index), new { sortOrder = retParams.Item1, pageNumber = retParams.Item1 });
+        }
+
+        Tuple<string,int> GetCurrentViewDataParams()
+        {
             string sort = "";
             int index = 1;
             if (ViewData.ContainsKey("CurrentSort"))
                 sort = ViewData["CurrentSort"].ToString();
             if (ViewData.ContainsKey("PageIndex"))
                 index = int.Parse(ViewData["PageIndex"].ToString());
-
-            return RedirectToAction(nameof(Index), new { sortOrder = sort, pageNumber = index });
+            return new Tuple<string, int>(sort, index);
         }
 
         // GET: Admin/DogeImages/Delete/5
@@ -130,17 +139,13 @@ namespace Doge.Areas.Admin.Controllers
             var  sdogeImage = await _context.BigImages.FindAsync(id);
             _context.BigImages.Remove(sdogeImage);            
           
-            await _context.SaveChangesAsync();           
+            await _context.SaveChangesAsync();
 
 
-            string sort = "";
-            int index = 1;
-            if (ViewData.ContainsKey("CurrentSort"))
-                sort = ViewData["CurrentSort"].ToString();
-            if (ViewData.ContainsKey("PageIndex"))
-                index = int.Parse(ViewData["PageIndex"].ToString());
+            var retParams = GetCurrentViewDataParams();
 
-            return RedirectToAction(nameof(Index), new { sortOrder = sort, pageNumber = index });
+            return RedirectToAction(nameof(Index), new { sortOrder = retParams.Item1, pageNumber = retParams.Item1 });
+
         }
 
         #region ------------------------------------logs
@@ -157,12 +162,25 @@ namespace Doge.Areas.Admin.Controllers
         public IActionResult BrowseLog(string logName)
         {
             List<LogEntry> logEntries = new List<LogEntry>();
-            using (var clef = System.IO.File.OpenText(logName))
+            if (System.IO.File.Exists(logName))
             {
-                var reader = new LogEventReader(clef);
-                while (reader.TryRead(out LogEvent evt))
-                    logEntries.Add(evt.Convert());
-                reader.Dispose();
+                using (var clef = System.IO.File.OpenText(logName))
+                {
+                    var reader = new LogEventReader(clef);
+                    while (reader.TryRead(out LogEvent evt))
+                        logEntries.Add(evt.Convert());
+                    reader.Dispose();
+                }
+            }
+            else
+            {
+                logEntries.Add(new LogEntry
+                {
+                    mt = "",
+                    MyProperty = 1,
+                    SourceContext = "no such log found",
+                    t = DateTime.Now
+                });
             }
 
 
@@ -171,16 +189,19 @@ namespace Doge.Areas.Admin.Controllers
         [Authorize]
         public IActionResult DeleteLog(string logName)
         {
-            System.IO.File.Delete(logName);
+            if (System.IO.File.Exists(logName))
+                System.IO.File.Delete(logName);
             return RedirectToAction(nameof(IndexLogs));
         }
         #endregion
     }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 
     public class LogEntry
     {
         [Key]
         public int MyProperty { get; set; } //scaffolding does not work without key
+
         public DateTimeOffset @t { get; set; }
         public string @mt { get; set; }
         public string SourceContext { get; set; }

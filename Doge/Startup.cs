@@ -78,17 +78,17 @@ namespace Doge
                 options.Cookie.IsEssential = true;
             });
 
-            //services.AddAuthentication()
-            //    .AddVkontakte(options =>
-            //    {
-            //        options.ClientId = Configuration["VkIds:ClientId"];
-            //        options.ClientSecret = Configuration["VkIds:ClientSecret"];
-            //    }).AddFacebook(options =>
-            //      {
-            //          options.ClientId = Configuration["FBIds:ClientId"];
-            //          options.AppSecret = Configuration["FBIds:AppSecret"];
-            //      }
-            //    ); 
+            services.AddAuthentication()
+                .AddVkontakte(options =>
+                {
+                    options.ClientId = Configuration["VkIds:ClientId"];
+                    options.ClientSecret = Configuration["VkIds:ClientSecret"];
+                }).AddFacebook(options =>
+                  {
+                      options.ClientId = Configuration["FBIds:ClientId"];
+                      options.AppSecret = Configuration["FBIds:AppSecret"];
+                  }
+                );
 
             services.AddSingleton<IGetPics, RedditPics>();
             services.AddHostedService<TimedHostedService>();
@@ -112,7 +112,7 @@ namespace Doge
             app.UseCookiePolicy();
             app.UseSession();
             app.UseAuthentication();
-           // app.ConfigureExceptionHandler();
+            app.ConfigureExceptionHandler();
 
             app.UseMvc(routes =>
             {

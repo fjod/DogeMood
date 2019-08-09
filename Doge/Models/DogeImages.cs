@@ -41,8 +41,7 @@ namespace Doge.Models
 
         public DogeBigImage DogeBigImage { get; set; }
 
-        public string URL { get; set; }
-        
+        public string URL { get; set; }        
 
         public DogePost Post { get; set; }
     }

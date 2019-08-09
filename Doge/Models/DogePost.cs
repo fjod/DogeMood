@@ -22,7 +22,6 @@ namespace Doge.Models
         public int DogeImageFK { get; set; }        
         public DogeSmallImage DogeImage { get; set; }
 
-
         //each user can have multiple favorite posts
         //each post can have multiple users that favorited it
         //many-to-many relation

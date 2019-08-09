@@ -10,7 +10,6 @@ using Doge.Areas.User.Models;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using Doge.Utils;
 using System.Net;
@@ -18,19 +17,16 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http.Headers;
 
 namespace Doge.Areas.User.Controllers
 {
-    
-
     [Area("User")]
     public class HomeController : AlertController
     {  
         ApplicationDbContext Db { get; set; }
-
         readonly IHostingEnvironment _env;
         private readonly IServiceScopeFactory scopeFactory;
+
         public HomeController(ApplicationDbContext db, IHostingEnvironment env, IServiceScopeFactory scope)
         {
             this.Db = db;
@@ -40,15 +36,10 @@ namespace Doge.Areas.User.Controllers
 
         public async Task<IActionResult> UserFavorites(int pageNumber = 1)
         {       
-
             var claimsId = (ClaimsIdentity)User.Identity;
             var cl = claimsId.FindFirst(ClaimTypes.NameIdentifier);
             var userId = cl.Value;
-            var dbUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);
-
-            var favPosts = (from p in Db.Posts
-                            where p.Users.Any(post => post.DogeUser == dbUser)
-                            select p);
+            var dbUser = Db.DogeUsers.FirstOrDefault(u => u.Id == userId);    
 
             var favPost = Db.Posts.
                 Include(p => p.DogeImage).
@@ -56,15 +47,14 @@ namespace Doge.Areas.User.Controllers
                 Where(p => p.Users.Any(post => post.DogeUser == dbUser)).AsQueryable();
 
             var paginatedDoges = await PaginatedList<DogePost>.CreateAsync(favPost, pageNumber, totalPostOnPage);
-            if (pageNumber > favPosts.Count() / totalPostOnPage + 1)
+            if (pageNumber > favPost.Count() / totalPostOnPage + 1)
             {
-                pageNumber = favPosts.Count() / totalPostOnPage + 1;
+                pageNumber = favPost.Count() / totalPostOnPage + 1;
             }
             if (pageNumber <= 0)
             {
                 pageNumber = 1;
             }
-
                        
             List<DogePostForUser> lt = new List<DogePostForUser>();
 
@@ -92,7 +82,6 @@ namespace Doge.Areas.User.Controllers
         [Authorize]
         public async Task<IActionResult> UploadNewDogePOST(UploadDoge _doge)
         {
-
             var file = HttpContext.Request.Form.Files;
 
             if (!_doge.DogeURL.IsNullOrEmpty() &&
@@ -118,10 +107,8 @@ namespace Doge.Areas.User.Controllers
             var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");
 
             if (file.Any())
-            {
-               // var filePath = Path.GetTempFileName();
+            {             
                
-
                 if (file.First().Length > 0)
                 {
                     using (var stream = new FileStream(imagePath, FileMode.Create))
@@ -132,10 +119,7 @@ namespace Doge.Areas.User.Controllers
                 
             }
             else
-            {
-                //string webRootPath = _env.WebRootPath;
-                //var imagePath = Path.Combine(webRootPath, "images\\tempDoge.jpg");
-
+            {               
                 using (var client = new WebClient())
                 {
                     client.DownloadFile(_doge.DogeURL, imagePath);
@@ -213,6 +197,7 @@ namespace Doge.Areas.User.Controllers
                           Include(post => post.DogeImage).ThenInclude(im => im.DogeBigImage).
                           Include(u => u.Users).
                           OrderByDescending(p => p.AddDate);
+                
             }
 
             if (sortOrder == "byTop")

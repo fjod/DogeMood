@@ -25,9 +25,21 @@ namespace Doge.Utils
 
         public static byte[] ToThumbnail(this Bitmap image)
         {
-            float ratio = image.Width / image.Height;
-            if (ratio == 0) ratio = 1;
-            SizeF newSize = new SizeF(200, 200 * ratio);
+            float ratio = 1;
+            try
+            {
+                ratio = image.Width / image.Height;
+            }
+            catch(Exception)
+            {
+                ratio = 1;
+            }
+
+            if (ratio == 0) ratio = 1; 
+            
+            
+            SizeF newSize = new SizeF(200, 200 * ratio);//works wierd during tests for some reason
+            //so I have to check if ratio is good
             Bitmap target = new Bitmap((int)newSize.Width, (int)newSize.Height);
 
             using (Graphics graphics = Graphics.FromImage(target))
@@ -59,10 +71,12 @@ namespace Doge.Utils
     {
         public static Doge.Areas.Admin.Controllers.LogEntry Convert(this Serilog.Events.LogEvent reader)
         {
-            Doge.Areas.Admin.Controllers.LogEntry lt = new Doge.Areas.Admin.Controllers.LogEntry();
-            lt.t = reader.Timestamp;
-            lt.SourceContext = reader.MessageTemplate.Text;
-            lt.mt = reader.Level.ToString();
+            Doge.Areas.Admin.Controllers.LogEntry lt = new Doge.Areas.Admin.Controllers.LogEntry
+            {
+                t = reader.Timestamp,
+                SourceContext = reader.MessageTemplate.Text,
+                mt = reader.Level.ToString()
+            };
             return lt;
         }
     }
@@ -88,15 +102,14 @@ namespace Doge.Utils
     public static class UserRoles
     {
         public static string DogeAdmin = "DogeAdmin";
-        public static string DogeUser = "DogeUser";
-
-        
+        public static string DogeUser = "DogeUser";        
     }
 
     public class PaginatedList<T> : List<T>
     {
         public int PageIndex { get; private set; }
         public int TotalPages { get; private set; }
+
         public List<DogePostForUser> Posts;
 
         public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)

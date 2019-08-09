@@ -26,10 +26,7 @@ namespace Doge
            .CreateLogger();
 
             CreateWebHostBuilder(args).Build().Run();
-        }
-
-        //usage for logs: Log.ForContext<TimedHostedService>().Warning("message");
-
+        }        
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)

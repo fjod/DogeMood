@@ -22,7 +22,7 @@ namespace Tests
         {
             var user = new DogeUser() { UserName = "JohnDoe", Id = "1" };
             
-            context.DogeUsers.Add(user);
+            
 
             for (int i = 0; i < TotalPostsInDb; i++)
             {
@@ -50,10 +50,14 @@ namespace Tests
                         _up
                     };
                 }
+             
                 post.AddDate.AddDays(i);
+
                 context.SmallImages.Add(im);
                 context.Posts.Add(post);
             }
+
+            context.DogeUsers.Add(user);
             context.SaveChanges();
         }
 

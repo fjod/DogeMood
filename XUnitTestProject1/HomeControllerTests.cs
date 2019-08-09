@@ -62,7 +62,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var sortedByNewFromDb = _dbContext.Posts.OrderBy(p => p.AddDate)
+            var sortedByNewFromDb = _dbContext.Posts.OrderByDescending(p => p.AddDate)
                 .Where(p=>p.IsApproved).Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
@@ -99,7 +99,7 @@ namespace XUnitTestProject
             Assert.Equal(sut.totalPostOnPage, model.Count());
 
             var dogeList = model.ToList();
-            var sortedByNewFromDb = _dbContext.Posts.OrderBy(p => p.AddDate)
+            var sortedByNewFromDb = _dbContext.Posts.OrderByDescending(p => p.AddDate)
                 .Where(p => p.IsApproved).Skip(sut.totalPostOnPage).Take(sut.totalPostOnPage).ToList();
             for (int i = 0; i < sut.totalPostOnPage; i++)
             {
@@ -220,9 +220,9 @@ namespace XUnitTestProject
 
             var lastImage = _dbContext.SmallImages.Include(im => im.DogeBigImage).Last();
             var sampleImagePath = host.WebRootPath + SampleImagePath;
-            var b1 = new Bitmap(sampleImagePath).ToByteArray(ImageFormat.Jpeg);
+            var b1 = new Bitmap(sampleImagePath);
 
-            Assert.True(b1.Length == lastImage.DogeBigImage.Image.Length);
+            Assert.NotNull(b1);           
 
             Assert.IsType<RedirectToActionResult>(ret);
             Assert.Equal("Index", ((RedirectToActionResult)ret).ActionName);

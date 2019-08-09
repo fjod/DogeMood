@@ -71,9 +71,8 @@
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" asp-area="Admin"
                                        asp-controller="DogeImages" asp-action="Index">Index images</a>
-                                    <a class="dropdown-item"asp-area="Admin"
+                                    <a class="dropdown-item" asp-area="Admin"
                                        asp-controller="DogeImages" asp-action="IndexLogs">Read Logs</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
                                 </div>
                             </li>
                         }
@@ -87,7 +86,6 @@
     <div class="container">
         <partial name="_CookieConsentPartial" />
         <main role="main" class="pb-3">
-            @*@Html.Partial("_NotificationPanel")*@
             <partial name="_NotificationPanel" />
             @RenderBody()
         </main>
@@ -119,6 +117,7 @@
     </environment>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://kit.fontawesome.com/ddb89909e4.js"></script>
+   
     @RenderSection("Scripts", required: false)
 </body>
 </html>

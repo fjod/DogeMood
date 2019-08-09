@@ -14,13 +14,11 @@ using System.Threading.Tasks;
 namespace Doge.Utils
 {
     public class RedditPics : IGetPics
-    {
-       
-        IConfiguration Configuration { get; }
-     
+    {       
+        IConfiguration Configuration { get; }     
 
-        public RedditPics(IConfiguration configuration)        {
-           
+        public RedditPics(IConfiguration configuration)
+        {           
             Configuration = configuration;           
         }
 
@@ -68,8 +66,9 @@ namespace Doge.Utils
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "ahh come on")]
         class TokenResponse
-        {
+        {            
             public string access_token { get; set; }
             public string token_type { get; set; }
             public string expires_in { get; set; }
@@ -84,7 +83,6 @@ namespace Doge.Utils
 
             RedditAPI reddit = new RedditAPI(appId,
                     refreshToken, Secret, refreshToken);
-
             
             Subreddit sub = reddit.Subreddit("Shiba");
             var posts = sub.Posts.GetTop(new TimedCatSrListingInput(t: "day", limit: 10));   
@@ -96,15 +94,11 @@ namespace Doge.Utils
                 {
                     if (post is LinkPost)
                         images.Add(new DogeUrls(
-                        (post as LinkPost).URL, (post as LinkPost).Thumbnail));
-                    
+                        (post as LinkPost).URL, (post as LinkPost).Thumbnail));                    
                 }
             }
-
-
             return images;
-        }
-      
+        }      
     }
 
     public interface IGetPics

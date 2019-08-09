@@ -7,7 +7,6 @@ namespace Doge.Areas.User.Models
 {
     public class UploadDoge
     {
-        public string DogeURL { get; set; }
-       // public Doge.Models.DogeImage Doge { get; set; }
+        public string DogeURL { get; set; }       
     }
 }
