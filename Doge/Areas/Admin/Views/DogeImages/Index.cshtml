@@ -52,45 +52,45 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                
-                @{
-                    var b64 = Convert.ToBase64String(item.Pictogram);
-                    var imgsrc = string.Format("data:image/jpg;base64,{0}", b64); 
-                }
-                <img src="@imgsrc" />
-                     
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
 
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Post.IsApproved)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Post.AddDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Post.UpVotes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Post.Users.Count)
-            </td>
-            <td>
-                <div class="btn btn-group">
-                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                     @{
-                        if (!item.Post.IsApproved)
-                        {
-                            <a class="btn btn-success" asp-action="Approve" asp-route-id="@item.Id">Approve</a>
-                        }
+                        var b64 = Convert.ToBase64String(item.Pictogram);
+                        var imgsrc = string.Format("data:image/jpg;base64,{0}", b64);
                     }
-                </div>
-            </td>
-        </tr>
+                    <img src="@imgsrc" />
+
+
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Post.IsApproved)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Post.AddDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Post.UpVotes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Post.Users.Count)
+                </td>
+                <td>
+                    <div class="btn btn-group">
+                        <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        @{
+                            if (!item.Post.IsApproved)
+                            {
+                                <a class="btn btn-success" asp-action="Approve" asp-route-id="@item.Id">Approve</a>
+                            }
+                        }
+                    </div>
+                </td>
+            </tr>
         }
     </tbody>
 </table>
@@ -107,3 +107,4 @@
    class="btn btn-success @nextDisabled">
     Next
 </a>
+

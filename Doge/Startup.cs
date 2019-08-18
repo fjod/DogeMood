@@ -83,6 +83,7 @@ namespace Doge
                 {
                     options.ClientId = Configuration["VkIds:ClientId"];
                     options.ClientSecret = Configuration["VkIds:ClientSecret"];
+                    
                 }).AddFacebook(options =>
                   {
                       options.ClientId = Configuration["FBIds:ClientId"];

@@ -175,10 +175,10 @@ namespace XUnitTestProject
             var post = _dbContext.Posts.Take(1).First();
             var initialLikes = post.UpVotes;
 
-            await sut.LikePost2(post.Id);
+            await sut.LikePost(post.Id);
             Assert.True(initialLikes + 1 == post.UpVotes);
 
-            await sut.LikePost2(post.Id);
+            await sut.LikePost(post.Id);
             Assert.True(initialLikes== post.UpVotes);
 
         }

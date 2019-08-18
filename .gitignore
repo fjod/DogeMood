@@ -142,3 +142,10 @@ XUnitTestProject1/bin/Debug/netcoreapp2.2/Doge.Views.pdb
 XUnitTestProject1/bin/Debug/netcoreapp2.2/Doge.Views.dll
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/IndexLogs.g.cshtml.cs
 Doge/obj/Debug/netcoreapp2.2/Razor/Areas/Admin/Views/DogeImages/BrowseLog.g.cshtml.cs
+Doge/appsettings.production.json
+Doge/bin/Debug/netcoreapp2.2/publish/
+Doge/bin/Release/netcoreapp2.2/Doge.deps.json
+Doge/bin/
+Doge/obj/
+XUnitTestProject1/bin/
+XUnitTestProject1/obj/

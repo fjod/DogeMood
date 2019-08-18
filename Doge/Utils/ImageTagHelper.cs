@@ -43,6 +43,8 @@ namespace Doge
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
+            if (Image == null) return;
+
             string imgsrc = "";
 
             void usedDbImageIfPossible()
@@ -88,7 +90,7 @@ namespace Doge
 
                     string webRootPath = _env.WebRootPath;
                     var imagePath = Path.Combine(webRootPath, "images\\sampleImage.jpg");
-                    imgsrc = imagePath;
+                    imgsrc = "images\\sampleImage.jpg";
                 }  
             }
 

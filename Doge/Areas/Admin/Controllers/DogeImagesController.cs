@@ -37,6 +37,8 @@ namespace Doge.Areas.Admin.Controllers
             else
             ViewData["CurrentSort"] = sortOrder;
 
+
+
             PaginatedList <DogeSmallImage> pages;
             if (sortOrder == "UnApprovedOnly")
             {           
@@ -58,6 +60,14 @@ namespace Doge.Areas.Admin.Controllers
                 pages = await PaginatedList<DogeSmallImage>.CreateAsync(dogesThumbnails, pageNumber, totalPostOnPage);
 
             }
+
+            if (!TempData.ContainsKey("PageIndex"))
+                TempData.Add("PageIndex", pageNumber);
+            else TempData["PageIndex"] = pageNumber;
+
+            if (!TempData.ContainsKey("CurrentSort"))
+                TempData.Add("CurrentSort", pageNumber);
+            else TempData["CurrentSort"] = sortOrder;
 
             return View(pages);
         }
@@ -102,10 +112,10 @@ namespace Doge.Areas.Admin.Controllers
         {
             string sort = "";
             int index = 1;
-            if (ViewData.ContainsKey("CurrentSort"))
-                sort = ViewData["CurrentSort"].ToString();
-            if (ViewData.ContainsKey("PageIndex"))
-                index = int.Parse(ViewData["PageIndex"].ToString());
+            if (TempData.ContainsKey("CurrentSort"))
+                sort = TempData.Peek("CurrentSort").ToString();
+            if (TempData.ContainsKey("PageIndex"))
+                index = int.Parse(TempData.Peek("PageIndex").ToString());
             return new Tuple<string, int>(sort, index);
         }
 
@@ -164,8 +174,14 @@ namespace Doge.Areas.Admin.Controllers
             List<LogEntry> logEntries = new List<LogEntry>();
             if (System.IO.File.Exists(logName))
             {
-                using (var clef = System.IO.File.OpenText(logName))
+                Stream stream = System.IO.File.Open(logName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                StreamReader streamReader = new StreamReader(stream);
+                string str = streamReader.ReadToEnd();
+
+                //using (var clef = System.IO.File.OpenText(logName))
+                using (var clef = new StringReader(str))
                 {
+                    
                     var reader = new LogEventReader(clef);
                     while (reader.TryRead(out LogEvent evt))
                         logEntries.Add(evt.Convert());

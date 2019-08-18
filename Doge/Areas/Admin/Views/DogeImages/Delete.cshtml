@@ -12,22 +12,21 @@
     <h4>DogeImage</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-           Pic
+        <dt class="col-sm-2">
+            Pic
         </dt>
         <dd class="col-sm-10">
-            
+
             <img class="card-img-top img-fluid" Image="@Model.DogeSmallImage" />
         </dd>
-       
+
     </dl>
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index" 
-           asp-route-sortOrder="@ViewData["CurrentSort"]"
-           asp-route-pageNumber="@ViewData["PageIndex"]"
-           >Back to List</a>
+        <a asp-action="Index"
+           asp-route-sortOrder="@TempData.Peek("CurrentSort")"
+           asp-route-pageNumber="@TempData.Peek("PageIndex")">Back to List</a>
     </form>
 </div>

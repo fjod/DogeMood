@@ -36,7 +36,7 @@ namespace Doge.Utils
         }
 
         private void DoWork(object state)
-        {           
+        {            
             Log.ForContext<TimedHostedService>().Information("Downloading pics from Reddit..");
             using (var scope = scopeFactory.CreateScope())
             {

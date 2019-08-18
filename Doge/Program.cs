@@ -25,7 +25,11 @@ namespace Doge
                        rollingInterval: RollingInterval.Month)
            .CreateLogger();
 
+            Log.Information("app is started");
+
             CreateWebHostBuilder(args).Build().Run();
+
+            
         }        
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
