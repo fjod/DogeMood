@@ -14,3 +14,12 @@
 {"@t":"2019-08-18T05:52:18.7901656Z","@mt":"app is started"}
 {"@t":"2019-08-18T05:56:02.3220234Z","@mt":"app is started"}
 {"@t":"2019-08-18T06:04:32.7718278Z","@mt":"app is started"}
+{"@t":"2019-08-19T20:20:56.4058752Z","@mt":"app is started"}
+{"@t":"2019-08-19T20:24:32.8357857Z","@mt":"app is started"}
+{"@t":"2019-08-19T20:24:50.8357287Z","@mt":"app is started"}
+{"@t":"2019-08-19T20:26:44.1258401Z","@mt":"app is started"}
+{"@t":"2019-08-19T20:28:13.7237685Z","@mt":"app is started"}
+{"@t":"2019-08-25T06:07:13.4607950Z","@mt":"app is started"}
+{"@t":"2019-08-25T06:07:17.7438648Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}
+{"@t":"2019-08-25T06:10:10.8422761Z","@mt":"app is started"}
+{"@t":"2019-08-25T06:10:13.6982407Z","@mt":"Downloading pics from Reddit..","SourceContext":"Doge.Utils.TimedHostedService"}

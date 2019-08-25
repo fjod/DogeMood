@@ -11,6 +11,7 @@ using System.Net;
 using System.IO;
 using System.Drawing;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Doge.Utils
 {
@@ -36,7 +37,8 @@ namespace Doge.Utils
         }
 
         private void DoWork(object state)
-        {            
+        {
+            
             Log.ForContext<TimedHostedService>().Information("Downloading pics from Reddit..");
             using (var scope = scopeFactory.CreateScope())
             {
@@ -67,7 +69,15 @@ namespace Doge.Utils
                   ||
                   !p.ImageUrl.EndsWith(".png", StringComparison.Ordinal)
                 ));
-                
+
+                //no duplicates pls
+                var picsDuplicates = (from p in pics
+                       join oldPics in _context.SmallImages
+                        on p.ImageUrl equals oldPics.URL
+                       select p.ImageUrl).ToList();
+
+                pics.RemoveAll(p => picsDuplicates.Contains(p.ImageUrl));
+
                 pics.ForEach(pic =>
                 {
                     string webRootPath = _env.WebRootPath;
