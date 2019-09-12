@@ -33,7 +33,7 @@ namespace Doge.Areas.User.Controllers
             _env = env;
             scopeFactory = scope;
         }     
-
+        [Authorize]
         public async Task<IActionResult> UserFavorites(int pageNumber = 1)
         {       
             var claimsId = (ClaimsIdentity)User.Identity;
